@@ -30,9 +30,9 @@ const Item = ({ title, to, icon, selected, setSelected }: itemProps) => {
       }}
       onClick={() => setSelected(title)}
       icon={icon}
+       component={<Link to={to} />}
     >
       <Typography>{title}</Typography>
-      <Link to={to} />
     </MenuItem>
   );
 };
