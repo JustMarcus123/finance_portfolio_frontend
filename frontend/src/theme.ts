@@ -6,7 +6,7 @@ export const tokens = (mode:PaletteMode)=>({
     ...(mode === "dark"
         ?
         {
-           grey: {
+          grey: {
           100: "#e0e0e0",
           200: "#c2c2c2",
           300: "#a3a3a3",
@@ -165,7 +165,7 @@ return{
             })
         },
 
-         typography: {
+        typography: {
       fontFamily: ["Source Sans Pro", "sans-serif"].join(","),
       fontSize: 12,
 

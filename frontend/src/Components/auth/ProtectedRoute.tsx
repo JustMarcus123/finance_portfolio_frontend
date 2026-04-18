@@ -7,7 +7,7 @@ import { Navigate, Outlet } from "react-router-dom";
 
 const ProtectedRoute =()=>{
 
-    const {token , isLoading} = useAuth();
+    const {token , isLoading,user} = useAuth();
 
 
     console.log("Protected route check:", isLoading,"|token", token ? "EXISTS": "NULL")
@@ -30,8 +30,13 @@ const ProtectedRoute =()=>{
     //if there is not token or expired token then redirects it to login
     //replace ={true} means login wont be push to history push button wont loop
 
-    return token? <Outlet/>: <Navigate to="/login" replace/>
+  if(!token || !user){
+    console.log("No valid session, redirecting to /login");
+    return <Navigate to ="/login" replace/>
+  }
 
+  ///in case everything is good, --- allow access
+  return <Outlet/>
 }
 
 export default ProtectedRoute;
