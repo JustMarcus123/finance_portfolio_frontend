@@ -11,6 +11,7 @@ import Topbar from "./Scenes/global/topbar";
 import SideBar from "./Scenes/global/sidebar";
 import Login from "./Components/auth/Login";
 import ProtectedRoute from "./Components/auth/ProtectedRoute";
+import PlanManagement from "./Scenes/PlanManagement/PlanManagement";
 
 // ── Dashboard layout ──────────────────────────────────────────────────────────
 // Sidebar + Topbar only live here — completely separate from the login route
@@ -31,6 +32,7 @@ const DashboardLayout = () => {
         <Topbar setIsSidebar={setIsSidebar} />
         <Routes>
           <Route path="/" element={<Dashboard />} />
+          <Route path="plan-management" element={<PlanManagement/>}/>
           {/* Add more routes here as your app grows */}
           {/* <Route path="/team" element={<Team />} /> */}
         </Routes>

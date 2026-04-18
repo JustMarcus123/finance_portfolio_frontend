@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { loginApi } from "../Components/Apis/AuthApi";
+import { loginApi, logoutApi } from "../Components/Apis/AuthApi";
+import TokenStorage from "./TokenStorage";
 
 interface User {
   email: string;
@@ -48,22 +49,61 @@ export const AuthProvider = ({children}:{children: ReactNode}) => {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true); // it should be true until we check storage
 
-  //on app mount restore session from storage
 
-  useEffect(() => {
-    const stored =
-      localStorage.getItem("token") ?? sessionStorage.getItem("token");
-      console.log("token state changes:", token ? "HAS TOKEN": "NULL");
-    if (stored) {
-      const decoded = decodedToken(stored);
+  //on app mount restore session from storage
+useEffect(() => {
+  const restoreSession = async () => {
+    const storedAccess  = TokenStorage.getAccess();
+    const storedRefresh = TokenStorage.getRefresh();
+
+    if (storedAccess) {
+      // Access token exists — decode and restore
+      const decoded = decodedToken(storedAccess);
       if (decoded) {
-        setToken(stored);
+        setToken(storedAccess);
         setUser(decoded);
+        console.log("Session restored from access token:", decoded);
+        setIsLoading(false);
+        return; 
       }
     }
-    setIsLoading(false);
-  }, []);
 
+   
+    if (storedRefresh) {
+      console.log("No valid access token — attempting silent refresh...");
+      try {
+        const res = await fetch("http://localhost:8080/api/auth/refresh", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ refreshToken: storedRefresh }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          TokenStorage.setAccess(data.accessToken);
+          const decoded = decodedToken(data.accessToken);
+          if (decoded) {
+            setToken(data.accessToken);
+            setUser(decoded);
+            console.log("Session silently restored via refresh token:", decoded);
+          }
+        } else {
+          console.log("Refresh token rejected — clearing session");
+          TokenStorage.clearAll();
+        }
+      } catch (err) {
+        console.log("Refresh request failed:", err);
+        TokenStorage.clearAll();
+      }
+    } else {
+      console.log("No tokens found — user not authenticated");
+    }
+
+    setIsLoading(false);
+  };
+
+  restoreSession();
+}, []);
 // login
 
 const login = async (
@@ -71,35 +111,52 @@ const login = async (
   password: string,
   remember: boolean,
 ): Promise<void> => {
+
+  try{
   const data = await loginApi(email, password);
   
-  //spring boot return {token, email, message}
+ if(!data.accessToken){
+  throw new Error("No access token received");
+ }
 
-  const decoded = decodedToken(data.token);
-  if(!decoded) throw new Error("Received invalid token from server");
+ const decoded = decodedToken(data.accessToken);
+ if(!decoded){
+  throw new Error("Invalid access token received");
+ }
 
-  // remember me-> persist across browser close, otherwise session only
+ //stored token
+ TokenStorage.setAccess(data.accessToken);
+ TokenStorage.setRefresh(data.refreshToken,remember);
 
-  if(remember){
-    localStorage.setItem("token", data.token);
+ setToken(data.accessToken);
+ setUser(decoded);
 
-  }else{
-    sessionStorage.setItem("token", data.token);
+ console.log("Login successful --- token stored");
+  }catch (error:any){
+    console.error("login failed:", error.message);
   }
-
-  setToken(data.token);
-  setUser(decoded);
-
 };
 
 
 //logout 
 
-const logout =()=>{
-    localStorage.removeItem("token");
-    sessionStorage.removeItem("token");
+const logout =async(): Promise<void>=>{
+    try {
+      const refreshToken = TokenStorage.getRefresh();
+      if(refreshToken){
+        await logoutApi(refreshToken)
+        console.log("Server session revoked");
+      }
+    } catch (error) {
+      console.warn("Server logout failed, clearing local tokens anyway");
+    }
+
+    //clear everything locally
+    TokenStorage.clearAll()
     setToken(null);
     setUser(null);
+    console.log("Local session cleared")
+
 }
 
 return (

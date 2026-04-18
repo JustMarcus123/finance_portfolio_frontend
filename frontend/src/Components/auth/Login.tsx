@@ -25,12 +25,10 @@ interface fieldProps {
 }
 
 const Login = () => {
-
-      const theme = useTheme();
+  const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const {login} = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
-
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,35 +36,32 @@ const Login = () => {
   const [remember, setRemember] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null);
 
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    setError(null);
 
-const handleSubmit = async (e: any) => {
-  e.preventDefault();
-  setError(null);
+    if (!email.trim() || !password.trim()) {
+      setError("Please fill in the forms");
+      return;
+    }
 
-  if (!email.trim() || !password.trim()) {
-    setError("Please fill in the forms");
-    return;
-  }
+    setIsLoading(true);
+    try {
+      console.log("1. Calling login...");
+      await login(email.trim(), password, remember);
+      console.log("2. Login successful — navigating to /dashboard");
 
-  setIsLoading(true);
-  try {
-    console.log("1. Calling login...");
-    await login(email.trim(), password, remember);
-    console.log("2. Login successful — navigating to /dashboard");
+      navigate("/dashboard", { replace: true });
+    } catch (error: any) {
+      console.log("3. Login failed:", error.message);
+      setError(error.message ?? "Login failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    navigate("/dashboard", { replace: true });  
-
-  } catch (error: any) {
-    console.log("3. Login failed:", error.message);
-    setError(error.message ?? "Login failed. Please try again.");
-  } finally {
-    setIsLoading(false);
-  }
-};
-
-    
   const fieldStyles = (fieldName: string) => ({
     "& .MuiOutlinedInput-root": {
       color: colors.grey[100],
@@ -283,7 +278,6 @@ const handleSubmit = async (e: any) => {
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-            
               onFocus={() => setFocusedField("password")}
               onBlur={() => setFocusedField(null)}
               sx={{ ...fieldStyles("password"), mb: "8px" }}
