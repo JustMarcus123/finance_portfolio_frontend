@@ -169,7 +169,7 @@ const Dashboard = () => {
   plan_start_date:string,
   participants?: number;
   aua?: number;
-  status?: string;
+  sponsor_status?: string;
   }
 
   //states for displaying the sponsors
@@ -374,9 +374,9 @@ const Dashboard = () => {
         </Typography>
 
         {/* Status */}
-        <Box sx={{ display: "inline-block", px: "8px", py: "2px", borderRadius: "4px", backgroundColor: sp.status === "Active" ? "#4CCEAC22" : "#ff000022", border: `1px solid ${sp.status === "Active" ? "#4CCEAC44" : "#ff000044"}`, width: "fit-content" }}>
-          <Typography sx={{ fontSize: "11px", fontWeight: 600, color: sp.status === "Active" ? "#4CCEAC" : "#ff6b6b" }}>
-            {sp.status ?? "Unknown"}
+        <Box sx={{ display: "inline-block", px: "8px", py: "2px", borderRadius: "4px", backgroundColor: sp.sponsor_status === "Active" ? "#4CCEAC22" : "#ff000022", border: `1px solid ${sp.sponsor_status === "Active" ? "#4CCEAC44" : "#ff000044"}`, width: "fit-content" }}>
+          <Typography sx={{ fontSize: "11px", fontWeight: 600, color: sp.sponsor_status === "Active" ? "#4CCEAC" : "#ff6b6b" }}>
+            {sp.sponsor_status ?? "Unknown"}
           </Typography>
         </Box>
       </Box>
