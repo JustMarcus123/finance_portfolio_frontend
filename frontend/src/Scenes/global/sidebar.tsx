@@ -8,6 +8,9 @@ import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import LockOutlinedIcon from '@mui/icons-material/LockOutline';
+import LaptopIcon from '@mui/icons-material/Laptop';
+import NoteAltIcon from '@mui/icons-material/NoteAlt';
 
 interface SidebarProps {
   isSidebar: boolean;
@@ -168,16 +171,44 @@ const SideBar = ({ isSidebar }: SidebarProps) => {
               setSelected={setSelected}
             />
             <Item
-              title="Team"
-              to="/dashboard/team"
+              title="Participants"
+              to="/dashboard/participants"
               icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="Analytics"
-              to="/dashboard/analytics"
+              title="Contributions"
+              to="/dashboard/contributions"
               icon={<BarChartOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Vesting"
+              to="/dashboard/vestings"
+              icon={<LockOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Compliance"
+              to="/dashboard/compliance"
+              icon={<EventNoteIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="System Health"
+              to="/dashboard/systemHealth"
+              icon={<LaptopIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Audit Logs"
+              to="/dashboard/auditlogs"
+              icon={<NoteAltIcon />}
               selected={selected}
               setSelected={setSelected}
             />

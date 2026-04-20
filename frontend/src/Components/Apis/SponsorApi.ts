@@ -1,6 +1,7 @@
 const BASE_URL = "http://localhost:8080";
 
 interface SponsorType {
+  id: string;
   company_name: string;
   ein: string;
   primaryContactName: string;
@@ -16,6 +17,8 @@ interface SponsorType {
   vesting_schedule:string,
   safe_harbour_plan:string,
   plan_start_date:string,
+  sponsorStatus:string
+   compliance: string
 }
 
 export const createSponsorApi = async (
@@ -79,4 +82,29 @@ throw new Error("fetching all sponsor fails");
 return await res.json();
 
 }
+
+
+//update the sponsor
+
+export const updateSponsorApi = async(id: string| number , data:any):Promise<any>=>{
+
+const res = await fetch(`${BASE_URL}/api/sponsor/update_sponsor/${id}`,{
+
+  method:"PUT",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify(data)
+
+
+});
+
+if(!res.ok){
+  const errorText = await res.text();
+        throw new Error(`Update failed: ${res.status} - ${errorText}`);
+}
+
+return await res.json();
+
+};
+
+
 
