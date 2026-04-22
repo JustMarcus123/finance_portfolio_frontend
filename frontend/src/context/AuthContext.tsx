@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { loginApi, logoutApi } from "../Components/Apis/AuthApi";
 import TokenStorage from "./TokenStorage";
+import BASE_URL from "../config/api";
 
 interface User {
   email: string;
@@ -72,7 +73,7 @@ useEffect(() => {
     if (storedRefresh) {
       console.log("No valid access token — attempting silent refresh...");
       try {
-        const res = await fetch("http://localhost:8080/api/auth/refresh", {
+        const res = await fetch(`${BASE_URL}/api/auth/refresh`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ refreshToken: storedRefresh }),
