@@ -4,37 +4,45 @@ import { ThemeProvider } from "@mui/material";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ColorModeContext, useMode } from "./theme";
 import { AuthProvider } from "./context/AuthContext";
-// import ProtectedRoute from "./components/ProtectedRoute";
-// import Login from "./Scenes/Login/Login";
 import Dashboard from "./Scenes/Dashboard/Dashboard";
 import Topbar from "./Scenes/global/topbar";
 import SideBar from "./Scenes/global/sidebar";
 import Login from "./Components/auth/Login";
 import ProtectedRoute from "./Components/auth/ProtectedRoute";
 import PlanManagement from "./Scenes/PlanManagement/PlanManagement";
+import EmployerDashboard from "./Scenes/Employer/Dashboard";
 
-// ── Dashboard layout ──────────────────────────────────────────────────────────
-// Sidebar + Topbar only live here — completely separate from the login route
-const DashboardLayout = () => {
+// ── Super Admin Layout ────────────────────────────────────────────────────────
+const AdminLayout = () => {
   const [isSidebar, setIsSidebar] = useState<boolean>(true);
 
   return (
     <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
       <SideBar isSidebar={isSidebar} />
-      <main
-        style={{
-          flex: 1,
-          overflow: "auto",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
+      <main style={{ flex: 1, overflow: "auto", display: "flex", flexDirection: "column" }}>
         <Topbar setIsSidebar={setIsSidebar} />
         <Routes>
           <Route path="/" element={<Dashboard />} />
-          <Route path="plan-management" element={<PlanManagement/>}/>
-          {/* Add more routes here as your app grows */}
-          {/* <Route path="/team" element={<Team />} /> */}
+          <Route path="/plan-management" element={<PlanManagement />} />
+        </Routes>
+      </main>
+    </div>
+  );
+};
+
+// ── Employer Layout ───────────────────────────────────────────────────────────
+// Later you can give this its own sidebar/topbar with employer-specific nav
+const EmployerLayout = () => {
+  const [isSidebar, setIsSidebar] = useState<boolean>(true);
+
+  return (
+    <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
+      <SideBar isSidebar={isSidebar} />   {/* swap with EmployerSidebar later */}
+      <main style={{ flex: 1, overflow: "auto", display: "flex", flexDirection: "column" }}>
+        <Topbar setIsSidebar={setIsSidebar} />
+        <Routes>
+          <Route path="/" element={<EmployerDashboard />} />
+          {/* Add more employer routes here */}
         </Routes>
       </main>
     </div>
@@ -52,17 +60,20 @@ function App() {
           <CssBaseline />
           <Routes>
 
-            {/* ✅ Public — completely standalone, no sidebar/topbar */}
+            {/* Public */}
             <Route path="/login" element={<Login />} />
 
-            {/*    Protected — ProtectedRoute checks for valid JWT         */}
-            {/*    No token → redirects to /login                          */}
-            {/*    Valid token → renders DashboardLayout via <Outlet />    */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/dashboard/*" element={<DashboardLayout />} />
+            {/* Super Admin only */}
+            <Route element={<ProtectedRoute requiredRole="SUPER_ADMIN" />}>
+              <Route path="/admin/dashboard/*" element={<AdminLayout />} />
             </Route>
 
-            {/* Catch-all → login */}
+            {/* Employer Admin only */}
+            <Route element={<ProtectedRoute requiredRole="EMPLOYER_ADMIN" />}>
+              <Route path="/employer/dashboard/*" element={<EmployerLayout />} />
+            </Route>
+
+            {/* Catch-all */}
             <Route path="*" element={<Navigate to="/login" replace />} />
 
           </Routes>

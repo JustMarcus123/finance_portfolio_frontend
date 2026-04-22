@@ -157,61 +157,61 @@ const SideBar = ({ isSidebar }: SidebarProps) => {
           {/* ── Nav items ── */}
           <Box paddingLeft={isCollapsed ? undefined : "10px"}>
             <Item
-              title="Dashboard"
-              to="/dashboard"
-              icon={<HomeOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Plan Management"
-              to="/dashboard/plan-management"
-              icon={<EventNoteIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Participants"
-              to="/dashboard/participants"
-              icon={<PeopleOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Contributions"
-              to="/dashboard/contributions"
-              icon={<BarChartOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Vesting"
-              to="/dashboard/vestings"
-              icon={<LockOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Compliance"
-              to="/dashboard/compliance"
-              icon={<EventNoteIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="System Health"
-              to="/dashboard/systemHealth"
-              icon={<LaptopIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Audit Logs"
-              to="/dashboard/auditlogs"
-              icon={<NoteAltIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
+  title="Dashboard"
+  to="/admin/dashboard"
+  icon={<HomeOutlinedIcon />}
+  selected={selected}
+  setSelected={setSelected}
+/>
+<Item
+  title="Plan Management"
+  to="/admin/dashboard/plan-management"
+  icon={<EventNoteIcon />}
+  selected={selected}
+  setSelected={setSelected}
+/>
+<Item
+  title="Participants"
+  to="/admin/dashboard/participants"
+  icon={<PeopleOutlinedIcon />}
+  selected={selected}
+  setSelected={setSelected}
+/>
+<Item
+  title="Contributions"
+  to="/admin/dashboard/contributions"
+  icon={<BarChartOutlinedIcon />}
+  selected={selected}
+  setSelected={setSelected}
+/>
+<Item
+  title="Vesting"
+  to="/admin/dashboard/vestings"
+  icon={<LockOutlinedIcon />}
+  selected={selected}
+  setSelected={setSelected}
+/>
+<Item
+  title="Compliance"
+  to="/admin/dashboard/compliance"
+  icon={<EventNoteIcon />}
+  selected={selected}
+  setSelected={setSelected}
+/>
+<Item
+  title="System Health"
+  to="/admin/dashboard/systemHealth"
+  icon={<LaptopIcon />}
+  selected={selected}
+  setSelected={setSelected}
+/>
+<Item
+  title="Audit Logs"
+  to="/admin/dashboard/auditlogs"
+  icon={<NoteAltIcon />}
+  selected={selected}
+  setSelected={setSelected}
+/>
           </Box>
         </Menu>
       </Sidebar>
