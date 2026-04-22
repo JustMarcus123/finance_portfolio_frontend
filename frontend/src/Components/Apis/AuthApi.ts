@@ -111,8 +111,8 @@ const request=async<T>(method: string,  path:string, body?:unknown, authenticate
  export const loginApi =(email:string, password:string)=>
    request<AuthResponse>("POST","/api/auth/login",{email, password});
 
- export const logoutApi=(refreshToken:string)=>
-    request<AuthResponse>("POST","/api/auth/lougout")
+export const logoutApi = (refreshToken: string) =>
+    request<void>("POST", "/api/auth/logout", { refreshToken });
 
 
 

@@ -1,20 +1,45 @@
 import IconButton from "@mui/material/IconButton";
 import { useTheme } from "@mui/material/styles";
-import { Box, InputBase } from "@mui/material";
+import { Box, Button, InputBase } from "@mui/material";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import { ColorModeContext, tokens } from "../../theme";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import NotificationsOutlinedIcon from "@mui/icons-material/Notifications";
 import SettingsOutlinedIcon from "@mui/icons-material/Settings";
 import PersonOutlinedIcon from "@mui/icons-material/Person";
+import { useAuth } from "../../context/AuthContext";
+import { useNavigate, Navigate } from 'react-router-dom';
 
 interface TopbarProps {
   setIsSidebar: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+
+
+//state to handle logout
+
+
+
+
 const Topbar = ({ setIsSidebar }: TopbarProps) => {
+
+const {logout} = useAuth()
+const navigate = useNavigate();
+
+const handleLogout = async () => {
+  try {
+    await logout();
+  } catch (e) {
+    console.error("Logout failed:", e);
+  } finally {
+    // redirect user no matter what
+    navigate("/login"); 
+  }
+};
+
+
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
@@ -55,6 +80,7 @@ const Topbar = ({ setIsSidebar }: TopbarProps) => {
         <IconButton>
           <PersonOutlinedIcon />
         </IconButton>
+        <Button onClick={handleLogout}>Logout</Button>
       </Box>
     </Box>
   );

@@ -23,6 +23,7 @@ import AddIcon from "@mui/icons-material/Add";
 import React, { useEffect, useState } from "react";
 import { PlanTypeApi } from "../../Components/Apis/PlanManagementApi";
 import {
+  activateSponsorApi,
   createSponsorApi,
   fetchAllSponsor,
   updateSponsorApi,
@@ -314,6 +315,26 @@ const PlanManagement = () => {
     }
 
   }
+
+
+  //activate section
+  const [activating, setActivating] = useState(false);
+
+const handleActivate = async () => {
+  if (!selectedSponsor) return;
+  setActivating(true);
+  try {
+    await activateSponsorApi(selectedSponsor.id);
+    // refresh the sponsor list
+    const data = await fetchAllSponsor();
+    setSponsor(data);
+    setViewSponsor(false);
+  } catch (err: any) {
+    console.error(err.message || "Activation failed");
+  } finally {
+    setActivating(false);
+  }
+};
 
   // ─── Shared styles ─────────────────────────────────────────────────────────
   const cardSx = {
@@ -1402,11 +1423,29 @@ const PlanManagement = () => {
               </Button>
 
                <Button
-                onClick={() => setViewSponsor(false)}
-                sx={{ ...actionBtnSx, px: 3 }}
-              >
-                Activate
-              </Button>
+  onClick={handleActivate}
+  disabled={activating || selectedSponsor?.sponsorStatus === "ACTIVE"}
+  sx={{
+    ...actionBtnSx,
+    px: 3,
+    bgcolor: selectedSponsor?.sponsorStatus === "ACTIVE" 
+      ? "transparent" 
+      : "#4CCEAC18",
+    color: selectedSponsor?.sponsorStatus === "ACTIVE" 
+      ? colors.grey[500] 
+      : "#4CCEAC",
+    border: `1px solid ${selectedSponsor?.sponsorStatus === "ACTIVE" 
+      ? colors.grey[700] 
+      : "#4CCEAC33"}`,
+    "&:hover": {
+      bgcolor: selectedSponsor?.sponsorStatus === "ACTIVE" 
+        ? "transparent" 
+        : "#4CCEAC28",
+    },
+  }}
+>
+  {activating ? "Activating..." : selectedSponsor?.sponsorStatus === "ACTIVE" ? "Activated" : "Activate"}
+</Button>
             </Box>
           </Box>
         )}
