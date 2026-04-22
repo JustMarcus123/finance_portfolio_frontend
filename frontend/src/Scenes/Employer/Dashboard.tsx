@@ -1,6 +1,6 @@
 
 
-const Dashboard =()=>{
+const EmployerDashboard =()=>{
     return(
         <div>
         <p>Employer Dashboard</p>
@@ -9,4 +9,4 @@ const Dashboard =()=>{
 }
 
 
-export default Dashboard;
+export default EmployerDashboard;
