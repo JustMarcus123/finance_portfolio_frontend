@@ -128,9 +128,9 @@ const login = async (
 
     // ← redirect based on role
     if (decoded.role === "SUPER_ADMIN") {
-      window.location.href = "/dashboard";
+      window.location.href = "/admin/dashboard";
     } else if (decoded.role === "EMPLOYER_ADMIN") {
-      window.location.href = "/dashboard";
+      window.location.href = "/employer/dashboard";
     }
 
   } catch (error: any) {
