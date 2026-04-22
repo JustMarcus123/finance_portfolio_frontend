@@ -1,7 +1,7 @@
 
 import TokenStorage from "../../context/TokenStorage";
 
-const BASE_URL ="http://localhost:8080"
+import BASE_URL from "../../config/api";
 
 export interface AuthResponse{
     accessToken: string;
