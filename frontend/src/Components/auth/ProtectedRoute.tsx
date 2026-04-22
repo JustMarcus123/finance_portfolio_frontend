@@ -5,38 +5,28 @@ import { Navigate, Outlet } from "react-router-dom";
 
 
 
-const ProtectedRoute =()=>{
+const ProtectedRoute = ({ requiredRole }: { requiredRole?: string }) => {
+    const { token, isLoading, user } = useAuth();
 
-    const {token , isLoading,user} = useAuth();
-
-
-    console.log("Protected route check:", isLoading,"|token", token ? "EXISTS": "NULL")
-
-    const theme = useTheme();
-    const color = tokens(theme.palette.mode);
-
-    if(isLoading){
-        return(
-    <Box  display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="100vh"
-        sx={{ backgroundColor: color.primary[500] }}>
-        <CircularProgress sx={{color: color.greenAccent[400]}}/>
-    </Box>
-)
+    if (isLoading) {
+        return (
+            <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+                <CircularProgress />
+            </Box>
+        );
     }
 
-    //if there is not token or expired token then redirects it to login
-    //replace ={true} means login wont be push to history push button wont loop
+    if (!token || !user) {
+        console.log("No valid session, redirecting to /login");
+        return <Navigate to="/login" replace />;
+    }
 
-  if(!token || !user){
-    console.log("No valid session, redirecting to /login");
-    return <Navigate to ="/login" replace/>
-  }
+    // Role guard — e.g. EMPLOYER_ADMIN trying to access SUPER_ADMIN routes
+    if (requiredRole && user.role !== requiredRole) {
+        return <Navigate to="/unauthorized" replace />;
+    }
 
-  ///in case everything is good, --- allow access
-  return <Outlet/>
-}
+    return <Outlet />;
+};
 
 export default ProtectedRoute;

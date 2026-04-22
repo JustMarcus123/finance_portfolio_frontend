@@ -105,35 +105,37 @@ useEffect(() => {
   restoreSession();
 }, []);
 // login
-
 const login = async (
   email: string,
   password: string,
   remember: boolean,
 ): Promise<void> => {
+  try {
+    const data = await loginApi(email, password);
 
-  try{
-  const data = await loginApi(email, password);
-  
- if(!data.accessToken){
-  throw new Error("No access token received");
- }
+    if (!data.accessToken) throw new Error("No access token received");
 
- const decoded = decodedToken(data.accessToken);
- if(!decoded){
-  throw new Error("Invalid access token received");
- }
+    const decoded = decodedToken(data.accessToken);
+    if (!decoded) throw new Error("Invalid access token received");
 
- //stored token
- TokenStorage.setAccess(data.accessToken);
- TokenStorage.setRefresh(data.refreshToken,remember);
+    TokenStorage.setAccess(data.accessToken);
+    TokenStorage.setRefresh(data.refreshToken, remember);
 
- setToken(data.accessToken);
- setUser(decoded);
+    setToken(data.accessToken);
+    setUser(decoded);
 
- console.log("Login successful --- token stored");
-  }catch (error:any){
+    console.log("Login successful — role:", decoded.role);
+
+    // ← redirect based on role
+    if (decoded.role === "SUPER_ADMIN") {
+      window.location.href = "/dashboard";
+    } else if (decoded.role === "EMPLOYER_ADMIN") {
+      window.location.href = "/dashboard";
+    }
+
+  } catch (error: any) {
     console.error("login failed:", error.message);
+    throw error; // ← rethrow so Login.tsx can show the error to the user
   }
 };
 

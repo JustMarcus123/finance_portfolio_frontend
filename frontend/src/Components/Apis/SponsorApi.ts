@@ -106,5 +106,19 @@ return await res.json();
 
 };
 
+export const activateSponsorApi = async (id: string | number): Promise<any> => {
+  const res = await fetch(`${BASE_URL}/api/sponsor/activate/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Activation failed: ${res.status} - ${errorText}`);
+  }
+
+  return await res.json();
+};
+
 
 
