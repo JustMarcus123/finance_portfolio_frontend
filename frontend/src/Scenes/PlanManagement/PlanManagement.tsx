@@ -774,12 +774,12 @@ const handleActivate = async () => {
                       fontWeight: 600,
                       height: "22px",
                       bgcolor:
-                        mappped_sponsor.sponsorStatus === "Active"
+                        mappped_sponsor.sponsorStatus === "ACTIVE"
                           ? "#4CCEAC18"
                           : "#e74c3c18",
                       color:
-                        mappped_sponsor.sponsorStatus === "Active" ? "#4CCEAC" : "#ff6b6b",
-                      border: `1px solid ${mappped_sponsor.sponsorStatus === "Active" ? "#4CCEAC33" : "#e74c3c33"}`,
+                        mappped_sponsor.sponsorStatus === "ACTIVE" ? "#4CCEAC" : "#ff6b6b",
+                      border: `1px solid ${mappped_sponsor.sponsorStatus === "ACTIVE" ? "#4CCEAC33" : "#e74c3c33"}`,
                       borderRadius: "6px",
                     }}
                   />
