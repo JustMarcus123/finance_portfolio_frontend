@@ -226,7 +226,7 @@ const Dashboard = () => {
               color: colors.grey[100],
             }}
           >
-            Good morning, {user?.firstName || "Marcus"} 👋
+            Good morning, {user?.firstName || ""} 👋
           </Typography>
         </Box>
 
