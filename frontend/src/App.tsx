@@ -11,6 +11,8 @@ import Login from "./Components/auth/Login";
 import ProtectedRoute from "./Components/auth/ProtectedRoute";
 import PlanManagement from "./Scenes/PlanManagement/PlanManagement";
 import EmployerDashboard from "./Scenes/Employer/Dashboard";
+import EmployerSideBar from "./Scenes/global/employerSideBar";
+import Participants from "./Scenes/Employer/Participants";
 
 // ── Super Admin Layout ────────────────────────────────────────────────────────
 const AdminLayout = () => {
@@ -37,11 +39,13 @@ const EmployerLayout = () => {
 
   return (
     <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
-      <SideBar isSidebar={isSidebar} />   {/* swap with EmployerSidebar later */}
+      <EmployerSideBar isSidebar={isSidebar} />   {/* swap with EmployerSidebar later */}
       <main style={{ flex: 1, overflow: "auto", display: "flex", flexDirection: "column" }}>
         <Topbar setIsSidebar={setIsSidebar} />
         <Routes>
           <Route path="/" element={<EmployerDashboard />} />
+          <Route path="/participants" element={<Participants/>}/>
+
           {/* Add more employer routes here */}
         </Routes>
       </main>

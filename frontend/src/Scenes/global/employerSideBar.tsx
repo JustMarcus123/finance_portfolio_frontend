@@ -1,16 +1,22 @@
-import { Box, IconButton, Typography, useTheme } from "@mui/material";
-import { tokens } from "../../theme";
-import { Menu, MenuItem, Sidebar, sidebarClasses } from "react-pro-sidebar";
-import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import EventNoteIcon from "@mui/icons-material/EventNote";
-import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
-import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
-import { useState } from "react";
+
+
+import { Box, IconButton,  Typography, useTheme } from "@mui/material"
+import { tokens } from "../../theme"
+import { MenuItem, Sidebar,sidebarClasses ,Menu} from "react-pro-sidebar";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
+import PaymentIcon from '@mui/icons-material/Payment';
+import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import EventNoteIcon from '@mui/icons-material/EventNote';
 import LockOutlinedIcon from '@mui/icons-material/LockOutline';
-import LaptopIcon from '@mui/icons-material/Laptop';
-import NoteAltIcon from '@mui/icons-material/NoteAlt';
+import ListAltIcon from '@mui/icons-material/ListAlt';
+
+
 
 interface SidebarProps {
   isSidebar: boolean;
@@ -40,7 +46,7 @@ const Item = ({ title, to, icon, selected, setSelected }: itemProps) => {
   );
 };
 
-const SideBar = ({ isSidebar }: SidebarProps) => {
+const EmployerSideBar = ({ isSidebar }: SidebarProps) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -78,7 +84,7 @@ const SideBar = ({ isSidebar }: SidebarProps) => {
       >
         <Menu
           menuItemStyles={{
-            button: ({ active }) => ({
+            button: ({ active }:{active:boolean}) => ({
               padding: "5px 35px 5px 20px",
               borderRadius: "4px",
               color: active ? "#6870fa" : colors.grey[100],
@@ -146,7 +152,7 @@ const SideBar = ({ isSidebar }: SidebarProps) => {
                 fontWeight="bold"
                 sx={{ m: "4px 0 2px 0" }}
               >
-                Super Admin
+                Employer
               </Typography>
               <Typography variant="h5" color={colors.greenAccent[500]}>
                 Admin
@@ -155,60 +161,68 @@ const SideBar = ({ isSidebar }: SidebarProps) => {
           )}
 
           {/* ── Nav items ── */}
-          <Box paddingLeft={isCollapsed ? undefined : "10px"}>
+        <Box paddingLeft={isCollapsed ? undefined : "10px"}>
             <Item
-  title="Dashboard"
-  to="/admin/dashboard"
-  icon={<HomeOutlinedIcon />}
-  selected={selected}
-  setSelected={setSelected}
-/>
-<Item
-  title="Plan Management"
-  to="/admin/dashboard/plan-management"
-  icon={<EventNoteIcon />}
+  title="Overview"
+  to="/employer/dashboard"
+  icon={<DashboardIcon/>}
   selected={selected}
   setSelected={setSelected}
 />
 <Item
   title="Participants"
-  to="/admin/dashboard/participants"
+  to="/employer/dashboard/participants"
   icon={<PeopleOutlinedIcon />}
   selected={selected}
   setSelected={setSelected}
 />
 <Item
-  title="Contributions"
-  to="/admin/dashboard/contributions"
-  icon={<BarChartOutlinedIcon />}
+  title="Payroll Upload"
+  to="/employer/dashboard/payrollupload"
+  icon={<PaymentIcon />}
   selected={selected}
   setSelected={setSelected}
 />
 <Item
-  title="Vesting"
-  to="/admin/dashboard/vestings"
-  icon={<LockOutlinedIcon />}
+  title="Contributions"
+  to="/employer/dashboard/contributions"
+  icon={<AttachMoneyIcon />}
+  selected={selected}
+  setSelected={setSelected}
+/>
+<Item
+  title="Loan Request"
+  to="/employer/dashboard/loanRequest"
+  icon={<AccountBalanceIcon />}
   selected={selected}
   setSelected={setSelected}
 />
 <Item
   title="Compliance"
-  to="/admin/dashboard/compliance"
+  to="/employer/dashboard/compliance"
   icon={<EventNoteIcon />}
   selected={selected}
   setSelected={setSelected}
 />
 <Item
-  title="System Health"
-  to="/admin/dashboard/systemHealth"
-  icon={<LaptopIcon />}
+  title="Vesting"
+  to="/employer/dashboard/vesting"
+  icon={<LockOutlinedIcon />}
   selected={selected}
   setSelected={setSelected}
 />
 <Item
-  title="Audit Logs"
-  to="/admin/dashboard/auditlogs"
-  icon={<NoteAltIcon />}
+  title="Analytics"
+  to="/employer/dashboard/auditlogs"
+  icon={<BarChartOutlinedIcon />}
+  selected={selected}
+  setSelected={setSelected}
+/>
+
+<Item
+  title="Enrollment"
+  to="/employer/dashboard/enrollment"
+  icon={<ListAltIcon />}
   selected={selected}
   setSelected={setSelected}
 />
@@ -219,4 +233,9 @@ const SideBar = ({ isSidebar }: SidebarProps) => {
   );
 };
 
-export default SideBar;
+export default EmployerSideBar;
+
+
+
+
+
