@@ -1,58 +1,83 @@
-import { Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Button,
+  Chip,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Stack,
+  TextField,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { tokens } from "../../theme";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import GroupsIcon from "@mui/icons-material/Groups";
-import AddIcon from '@mui/icons-material/Add';
-import React, { useState } from "react";
-import { CreateEmployeeApi } from "../../Components/Apis/EmployeeApi";
+import AddIcon from "@mui/icons-material/Add";
+import React, { useEffect, useState } from "react";
+import {
+  CreateEmployeeApi,
+  GetAllEmployees,
+} from "../../Components/Apis/EmployeeApi";
 
+interface EmployeeFormTypes {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email: string;
+  department: string;
+  jobTitle: string;
+  annualSalary: string;
+  startDate: string;
+  deferralRate: string;
+}
 
-interface EmployeeFormTypes{
-    firstName:string,
-    lastName: string,
-    phone: string,
-    email: string,
-    department: string,
-    jobTitle: string,
-    annualSalary:string,
-    startDate:string,
-    deferralRate: string
+interface EmployeeType {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email: string;
+  department: string;
+  jobTitle: string;
+  annualSalary: string;
+  deferralRate: string;
+  employeeId: string; //EMP-00182
+  status: string; //ACTIVE, NOT_ENROLLED, PENDING, TERMINATED
+  balance?: number;
+  vested?:string;
+  loan?:string
 
+  startDate: string;
 }
 
 const statCards = [
   {
-    label: "NET WORTH",
-    value: "$284,520",
-    change: "+$12,340",
-    sub: "vs. last month",
-    positive: true,
-    accent: "#4CCEAC",
+    label: "TOTAL",
+    value: "1,248",
+  
   },
   {
-    label: "TOTAL ASSETS",
-    value: "$318,900",
-    change: "+4.2%",
-    sub: "across 6 accounts",
-    positive: true,
-    accent: "#4CCEAC",
+    label: "ACTIVE",
+    value: "1,182",
+   
   },
   {
-    label: "MONTHLY SAVINGS",
-    value: "$2,840",
-    change: "28.4% rate",
-    sub: "of income saved",
-    positive: true,
-    accent: "#f0a500",
+    label: "NOT ENROLLED",
+    value: "270",
+  
   },
   {
-    label: "TOTAL LIABILITIES",
-    value: "$34,380",
-    change: "-$420",
-    sub: "debt reducing ✓",
-    positive: false,
-    accent: "#e74c3c",
+    label: "TERMINATED",
+    value: "66",
+   
+  },
+    {
+    label: "HAVE LOANS",
+    value: "187",
+   
   },
 ];
 
@@ -104,63 +129,85 @@ const EmployerDashboard = () => {
 
   const TABLE_COLS = "2fr 1.5fr 1fr 1.5fr 1fr 1.5fr 1.2fr 1.2fr 1.2fr 80px";
 
-
   //employee dialog
-  const [buttonLoading, setButtonLoading ] = useState(false)
-  const [isError, setIsError] = useState("")
-  const [isSuccess, setIsSuccess] = useState("")
+  const [buttonLoading, setButtonLoading] = useState(false);
+  const [isError, setIsError] = useState("");
+  const [isSuccess, setIsSuccess] = useState("");
   const [employeeDialogOpen, setIsEmployeeDialogOpen] = useState(false);
   const [employeeForm, setEmployeeForm] = useState<EmployeeFormTypes>({
-    firstName:"",
+    firstName: "",
     lastName: "",
     phone: "",
     email: "",
     department: "",
     jobTitle: "",
-    annualSalary:"",
-    startDate:"",
-    deferralRate: ""
-  })
+    annualSalary: "",
+    startDate: "",
+    deferralRate: "",
+  });
 
-
-const EmployeeHandleChange=(e:React.ChangeEvent<HTMLInputElement>)=>{
-
-
+  const EmployeeHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // const name = e.target.name
     // const value = e.target.value
-    const {name,value} = e.target;
+    const { name, value } = e.target;
 
-    setEmployeeForm ((prev)=>({...prev,[name]:value}))
+    setEmployeeForm((prev) => ({ ...prev, [name]: value }));
+  };
 
-};
-
-const submitEmployee =async()=>{
-    console.log(localStorage.getItem("accessToken"))
+  const submitEmployee = async () => {
+    console.log(localStorage.getItem("accessToken"));
     setButtonLoading(true);
-    setIsError("")
+    setIsError("");
 
     try {
-        await CreateEmployeeApi(employeeForm)
-        setIsSuccess("New Employee Created Successfully")
-        setButtonLoading(false)
-        setEmployeeForm( {firstName:"",
-    lastName: "",
-    phone: "",
-    email: "",
-    department: "",
-    jobTitle: "",
-    annualSalary:"",
-    startDate:"",
-    deferralRate: ""})
+      await CreateEmployeeApi(employeeForm);
+      setIsSuccess("New Employee Created Successfully");
+      setButtonLoading(false);
+      setEmployeeForm({
+        firstName: "",
+        lastName: "",
+        phone: "",
+        email: "",
+        department: "",
+        jobTitle: "",
+        annualSalary: "",
+        startDate: "",
+        deferralRate: "",
+      });
     } catch (err) {
-        setIsError( "server error");
-    }finally{
-        setIsEmployeeDialogOpen(false)
+      setIsError("server error");
+    } finally {
+      setIsEmployeeDialogOpen(false);
     }
+  };
 
-}
+  //fetch the employees
+  const [employees, setEmployees] = useState<EmployeeType[]>([]);
+  console.log(employees);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [employeeLoading, setEmployeeLoading] = useState(false);
 
+  useEffect(() => {
+    setError("");
+    setEmployeeLoading(true);
+    const fetchEmployee = async () => {
+      try {
+        const data = await GetAllEmployees();
+        console.log("response", data);
+        setEmployees(data);
+        setSuccess("fetching all the employees successful");
+        setEmployeeLoading(false);
+      } catch (error) {
+        console.error("fetch error", error);
+        setError("failed fetching the employees");
+      }finally{
+        setEmployeeLoading(false);
+      }
+    };
 
+    fetchEmployee();
+  }, []);
 
   return (
     <div>
@@ -192,35 +239,35 @@ const submitEmployee =async()=>{
             {/* we will be exchanging it to the company name later */}
           </Typography>
         </Box>
-         <Box sx={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-                    <Button
-                    //   onClick={() => setIsOpenPlanForm(true)}
-                      startIcon={<AddIcon sx={{ fontSize: 16 }} />}
-                      sx={actionBtnSx}
-                    >
-                    Export csv
-                    </Button>
-                    <Button
-                      onClick={()=>setIsEmployeeDialogOpen(true)}
-                      startIcon={<AddIcon sx={{ fontSize: 16 }} />}
-                      sx={{
-                        ...actionBtnSx,
-                        bgcolor: `${colors.blueAccent[500]}22`,
-                        color: colors.blueAccent[400],
-                        border: `1px solid ${colors.blueAccent[500]}44`,
-                        "&:hover": {
-                          bgcolor: `${colors.blueAccent[500]}33`,
-                          boxShadow: "none",
-                        },
-                      }}
-                    >
-                     Add Employee
-                    </Button>
-                  </Box>
+        <Box sx={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+          <Button
+            //   onClick={() => setIsOpenPlanForm(true)}
+            startIcon={<AddIcon sx={{ fontSize: 16 }} />}
+            sx={actionBtnSx}
+          >
+            Export csv
+          </Button>
+          <Button
+            onClick={() => setIsEmployeeDialogOpen(true)}
+            startIcon={<AddIcon sx={{ fontSize: 16 }} />}
+            sx={{
+              ...actionBtnSx,
+              bgcolor: `${colors.blueAccent[500]}22`,
+              color: colors.blueAccent[400],
+              border: `1px solid ${colors.blueAccent[500]}44`,
+              "&:hover": {
+                bgcolor: `${colors.blueAccent[500]}33`,
+                boxShadow: "none",
+              },
+            }}
+          >
+            Add Employee
+          </Button>
+        </Box>
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
+            gridTemplateColumns: "repeat(5, 1fr)",
             gap: "16px",
             mb: "20px",
           }}
@@ -236,7 +283,7 @@ const submitEmployee =async()=>{
                   fontWeight: 600,
                   color: colors.grey[500],
                   letterSpacing: "0.8px",
-                  mb: "8px",
+                  mb: "5px",
                 }}
               >
                 {card.label}
@@ -252,7 +299,7 @@ const submitEmployee =async()=>{
               >
                 {card.value}
               </Typography>
-              <Box sx={{ display: "flex", alignItems: "center", gap: "4px" }}>
+              {/* <Box sx={{ display: "flex", alignItems: "center", gap: "4px" }}>
                 {card.positive ? (
                   <TrendingUpIcon sx={{ fontSize: 14, color: "#4CCEAC" }} />
                 ) : (
@@ -267,7 +314,7 @@ const submitEmployee =async()=>{
                 >
                   {card.change}
                 </Typography>
-              </Box>
+              </Box> */}
               <Typography
                 sx={{ fontSize: "11px", color: colors.grey[600], mt: "2px" }}
               >
@@ -306,8 +353,8 @@ const submitEmployee =async()=>{
               <Box>
                 Participants
                 <Typography sx={{ fontSize: "11px", color: colors.grey[500] }}>
-                 
-                  infinity {/* change it with real employee numbers */}
+                  {employees.length} Employee{employees.length !== 1 ? "s" : ""}{" "}
+                  Total
                 </Typography>
               </Box>
             </Box>
@@ -346,28 +393,194 @@ const submitEmployee =async()=>{
             }}
           >
             {/* table heading */}
-            {
-                ["employee"," id", "dept", "start date","deferral", "balance"," vested", "loan", "status", "actions"].map((heading)=>(
-                    <Typography key={heading}
-                     sx={{
+            {[
+              "employee",
+              " id",
+              "dept",
+              "start date",
+              "deferral",
+              "balance",
+              " vested",
+              "loan",
+              "status",
+              "actions",
+            ].map((heading) => (
+              <Typography
+                key={heading}
+                sx={{
                   fontSize: "10px",
                   fontWeight: 700,
                   color: colors.grey[600],
                   letterSpacing: "0.8px",
                   textTransform: "uppercase",
-                }}>
-                    {heading}
-                    </Typography>
-                ))
-            }
+                }}
+              >
+                {heading}
+              </Typography>
+            ))}
           </Box>
+
+          {/*ROW */}
+          {employeeLoading ? (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                py: "24px",
+              }}
+            >
+              <CircularProgress
+                size={16}
+                sx={{ color: colors.blueAccent[400] }}
+              />
+              <Typography sx={{ fontSize: "13px", color: colors.grey[400] }}>
+                Loading employees....
+              </Typography>
+            </Box>
+          ) : employees.length === 0 ? (
+            <Box sx={{ py: "32px", textAlign: "center" }}>
+              <Typography sx={{ fontSize: "13px", color: colors.grey[500] }}>
+                No Employees found.
+              </Typography>
+            </Box>
+          ) : (
+            employees.map((mapped_employees, i) => (
+              <Box
+                key={i}
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: TABLE_COLS,
+                  alignItems: "center",
+                  py: "13px",
+                  borderBottom:
+                    i < employees.length - 1
+                      ? `1px solid ${colors.primary[300]}22`
+                      : "none",
+                  borderRadius: "8px",
+                  px: "4px",
+                  mx: "-4px",
+                  "&:hover": { backgroundColor: `${colors.primary[300]}18` },
+                  transition: "background-color 0.15s",
+                }}
+              >
+                {/* EMPLOYEE */}
+                <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <Box
+                    sx={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: "7px",
+                      bgcolor: `${colors.blueAccent[500]}22`,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        fontSize: "10px",
+                        fontWeight: 700,
+                        color: colors.blueAccent[400],
+                      }}
+                    >
+                      {mapped_employees.firstName
+                        ?.charAt(0)
+                        .toLocaleUpperCase() ?? "?"}{mapped_employees.lastName?.charAt(0).toLocaleUpperCase()}
+                    </Typography>
+                  </Box>
+                  <Typography
+                    sx={{
+                      fontSize: "13px",
+                      fontWeight: 600,
+                      color: colors.grey[200],
+                    }}
+                  >
+                    {mapped_employees.firstName}
+                  </Typography>
+                </Box>
+
+                {/* EMP_ID */}
+                <Box>
+                  <Chip  label={mapped_employees.employeeId}
+                    size="small"
+                    sx={{
+                      fontSize: "11px",
+                      fontWeight: 600,
+                      height: "22px",
+                      bgcolor: `${colors.blueAccent[500]}18`,
+                      color: colors.blueAccent[400],
+                      border: `1px solid ${colors.blueAccent[500]}33`,
+                      borderRadius: "6px",
+                    }}/>   
+                </Box>
+
+                {/* department */}
+               <Typography sx={{ fontSize: "12px", color: colors.grey[400] }}>
+                {mapped_employees.department}
+               </Typography>
+
+{/* start date */}
+
+                 <Typography sx={{ fontSize: "12px", color: colors.grey[400] }}>
+                {mapped_employees.startDate}
+               </Typography>
+
+               {/* deferral rate */}
+               <Typography sx={{ fontSize: "12px", color: colors.grey[400] }}>
+                {mapped_employees.deferralRate }
+               </Typography>
+{/* balance */}
+                <Typography sx={{ fontSize: "12px", color: colors.grey[400] }}>
+                {mapped_employees.balance
+                    ? `$${mapped_employees.balance.toLocaleString()}`
+                    : "—"}
+               </Typography>
+
+               {/* vested */}
+
+               <Typography sx={{ fontSize: "12px", color: colors.grey[400] }}>
+                {mapped_employees.vested
+                    ? `$${mapped_employees.vested.toLocaleString()}`
+                    : "—"}
+
+               </Typography>
+
+               {/* loan */}
+                <Typography sx={{ fontSize: "12px", color: colors.grey[400] }}>
+                {mapped_employees.loan
+                    ? `$${mapped_employees.loan.toLocaleString()}`
+                    : "—"}
+               </Typography>
+
+               {/* status */}
+
+               <Box>
+                  <Chip  label={mapped_employees.status ?? "unknown"}
+                    size="small"
+                    sx={{
+                      fontSize: "11px",
+                      fontWeight: 600,
+                      height: "22px",
+                      bgcolor: mapped_employees.status ==="ACTIVE" ?`${colors.greenAccent[300]}18 `:`${colors.redAccent[300]}`,
+                      color: mapped_employees.status ==="ACTIVE" ? colors.greenAccent[700] :colors.redAccent[700],
+                      border: `1px solid ${colors.blueAccent[500]}33`,
+                      borderRadius: "6px",
+                    }}/>   
+                </Box>
+
+              </Box>
+            ))
+          )}
         </Box>
       </Box>
 
       {/* employee form dialog */}
-      <Dialog open={employeeDialogOpen}
-      onClose={()=>setIsEmployeeDialogOpen(false)}
-       fullWidth
+      <Dialog
+        open={employeeDialogOpen}
+        onClose={() => setIsEmployeeDialogOpen(false)}
+        fullWidth
         maxWidth="sm"
         PaperProps={{
           sx: {
@@ -377,8 +590,9 @@ const submitEmployee =async()=>{
             color: colors.grey[100],
             boxShadow: "0 24px 64px rgba(0,0,0,0.4)",
           },
-        }}>
-              <DialogTitle sx={{ pb: 1 }}>
+        }}
+      >
+        <DialogTitle sx={{ pb: 1 }}>
           <Typography
             sx={{ fontSize: "18px", fontWeight: 700, color: colors.grey[100] }}
           >
@@ -387,131 +601,124 @@ const submitEmployee =async()=>{
           <Typography
             sx={{ fontSize: "12px", color: colors.grey[200], mt: 0.5 }}
           >
-            Capture core employee details before moving to enrollment
-            setup.
+            Capture core employee details before moving to enrollment setup.
           </Typography>
         </DialogTitle>
 
         <DialogContent>
-            <Typography
-                        sx={{
-                          fontSize: "10px",
-                          fontWeight: 700,
-                          color: colors.grey[200],
-                          letterSpacing: "0.9px",
-                          textTransform: "uppercase",
-                          mb: 1.5,
-                        }}
-                      >
-                        Employee information
-                      </Typography>
+          <Typography
+            sx={{
+              fontSize: "10px",
+              fontWeight: 700,
+              color: colors.grey[200],
+              letterSpacing: "0.9px",
+              textTransform: "uppercase",
+              mb: 1.5,
+            }}
+          >
+            Employee information
+          </Typography>
 
-                      <Stack spacing={2} sx={{ mb: 2.5 }}>
-                        <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}
+          <Stack spacing={2} sx={{ mb: 2.5 }}>
+            <Box
+              sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}
             >
-                <TextField label="First Name"
+              <TextField
+                label="First Name"
                 sx={dialogFieldSx}
                 fullWidth
                 name="firstName"
                 value={employeeForm.firstName}
                 onChange={EmployeeHandleChange}
-                />
-                <TextField 
+              />
+              <TextField
                 sx={dialogFieldSx}
                 label="Last Name"
                 name="lastName"
                 value={employeeForm.lastName}
                 onChange={EmployeeHandleChange}
+              />
 
-                />
-
-                  <TextField 
+              <TextField
                 sx={dialogFieldSx}
                 label="Phone Number"
                 name="phone"
                 value={employeeForm.phone}
                 onChange={EmployeeHandleChange}
+              />
 
-                />
-
-                  <TextField 
+              <TextField
                 sx={dialogFieldSx}
                 label="Email"
                 name="email"
                 value={employeeForm.email}
                 onChange={EmployeeHandleChange}
+              />
 
-                />
-
-                  <TextField 
+              <TextField
                 sx={dialogFieldSx}
                 label="Department"
                 name="department"
                 value={employeeForm.department}
                 onChange={EmployeeHandleChange}
+              />
 
-                />
-
-                  <TextField 
+              <TextField
                 sx={dialogFieldSx}
                 label="Job Titles"
                 name="jobTitle"
                 value={employeeForm.jobTitle}
                 onChange={EmployeeHandleChange}
+              />
 
-                />
-
-  <TextField
+              <TextField
                 sx={dialogFieldSx}
                 label="Annual Salary"
                 name="annualSalary"
                 value={employeeForm.annualSalary}
                 onChange={EmployeeHandleChange}
+              />
 
-                />
-
-                  <TextField 
+              <TextField
                 sx={dialogFieldSx}
                 label="Start Date"
                 name="startDate"
                 value={employeeForm.startDate}
                 onChange={EmployeeHandleChange}
+              />
 
-                />
-
-                   <TextField 
+              <TextField
                 sx={dialogFieldSx}
                 label="Deferral Rate"
                 name="deferralRate"
                 value={employeeForm.deferralRate}
                 onChange={EmployeeHandleChange}
-                 
-                />  
-                        </Box>
-                      </Stack>
-        </DialogContent >
+              />
+            </Box>
+          </Stack>
+        </DialogContent>
 
         <DialogActions sx={{ px: 3, pb: 3, gap: 1 }}>
-            <Button sx={{
+          <Button
+            sx={{
               color: colors.grey[400],
               textTransform: "none",
               borderRadius: "9px",
             }}
-            onClick={()=>setIsEmployeeDialogOpen(false)}
-            >
-                Cancel
-            </Button>
+            onClick={() => setIsEmployeeDialogOpen(false)}
+          >
+            Cancel
+          </Button>
 
-            <Button variant="contained" 
+          <Button
+            variant="contained"
             onClick={submitEmployee}
-            startIcon={buttonLoading ? <CircularProgress size={16}/>: null}
-                        sx={actionBtnSx}
-            >
-                {buttonLoading ? "Creating..." : "Create Sponsor"}
-            </Button>
-            
+            startIcon={buttonLoading ? <CircularProgress size={16} /> : null}
+            sx={actionBtnSx}
+          >
+            {buttonLoading ? "Creating..." : "Create Sponsor"}
+          </Button>
         </DialogActions>
-
       </Dialog>
     </div>
   );

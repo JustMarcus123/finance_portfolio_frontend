@@ -18,6 +18,7 @@ interface AuthContextType {
   logout: () => void;
 }
 
+
 // let's create the context here
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -105,7 +106,12 @@ useEffect(() => {
 
   restoreSession();
 }, []);
+
+
+//--------------------------------
 // login
+//--------------------------------'
+
 const login = async (
   email: string,
   password: string,
@@ -125,13 +131,17 @@ const login = async (
     setToken(data.accessToken);
     setUser(decoded);
 
-    console.log("Login successful — role:", decoded.role);
+    // console.log("the decoded jwt"+decoded)
+
+    // console.log("Login successful — role:", decoded.role);
 
     // ← redirect based on role
     if (decoded.role === "SUPER_ADMIN") {
       window.location.href = "/admin/dashboard";
     } else if (decoded.role === "EMPLOYER_ADMIN") {
       window.location.href = "/employer/dashboard";
+    }else if(decoded.role ==="EMPLOYEE"){
+      window.location.href ="/employee/dashboard";
     }
 
   } catch (error: any) {
@@ -140,8 +150,9 @@ const login = async (
   }
 };
 
-
+//-------------------------------
 //logout 
+//-------------------------------
 
 const logout =async(): Promise<void>=>{
     try {

@@ -34,7 +34,7 @@ import BusinessIcon from "@mui/icons-material/Business";
 import GroupsIcon from "@mui/icons-material/Groups";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import EditIcon from '@mui/icons-material/Edit';
+import EditIcon from "@mui/icons-material/Edit";
 
 interface FormType {
   company_name: string;
@@ -55,7 +55,7 @@ interface FormType {
 }
 
 interface SponsorType {
-  id:string;
+  id: string;
   company_name: string;
   ein: string;
   primaryContactName: string;
@@ -262,79 +262,72 @@ const PlanManagement = () => {
 
   // ─── View sponsor dialog ───────────────────────────────────────────────────
   const [viewSponsor, setViewSponsor] = useState(false);
-  const [selectedSponsor, setSelectedSponsor] = useState<SponsorType | null>(null);
+  const [selectedSponsor, setSelectedSponsor] = useState<SponsorType | null>(
+    null,
+  );
 
   //--- edit sponsor dialog
   const [editSponsorDialog, setEditSponsorDialog] = useState(false);
-  const [copyEditSponsor, setCopyEditSponsor] = useState<any>({})
-  const [isUpdating, setIsUpdating] = useState(false)
+  const [copyEditSponsor, setCopyEditSponsor] = useState<any>({});
+  const [isUpdating, setIsUpdating] = useState(false);
 
   console.log(copyEditSponsor);
 
   const handleOpenEdit = (sponsor: any) => {
     if (!sponsor?.id) {
-        alert("Error: Sponsor ID is missing!");
-        return;
+      alert("Error: Sponsor ID is missing!");
+      return;
     }
 
-    setCopyEditSponsor({ ...sponsor });        // Make a full copy including id
+    setCopyEditSponsor({ ...sponsor }); // Make a full copy including id
     setEditSponsorDialog(true);
-};
+  };
 
-  const handleEditSponsorChange =(e:React.ChangeEvent<HTMLInputElement>)=>{
+  const handleEditSponsorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
 
-    const {name, value} = e.target;
-
-    setCopyEditSponsor((prev:any)=>({
-
+    setCopyEditSponsor((prev: any) => ({
       ...prev,
-      [name]: value
-
+      [name]: value,
     }));
+  };
 
-  }
-
-  const handleUpdateSponsor =async()=>{
-
-    setIsUpdating(true)
+  const handleUpdateSponsor = async () => {
+    setIsUpdating(true);
 
     try {
-      
-       await updateSponsorApi(copyEditSponsor.id, copyEditSponsor)
+      await updateSponsorApi(copyEditSponsor.id, copyEditSponsor);
 
       alert("Sponsor updated successfully!");
 
       // Refresh the list
-        const refreshedList = await fetchAllSponsor();
-        setSponsor(refreshedList);
-
-    } catch (error:any) {
+      const refreshedList = await fetchAllSponsor();
+      setSponsor(refreshedList);
+    } catch (error: any) {
       alert(error.message || "Failed to update sponsor");
-    }finally{
+    } finally {
       setIsUpdating(false);
     }
-
-  }
-
+  };
 
   //activate section
   const [activating, setActivating] = useState(false);
 
-const handleActivate = async () => {
-  if (!selectedSponsor) return;
-  setActivating(true);
-  try {
-    await activateSponsorApi(selectedSponsor.id);
-    // refresh the sponsor list
-    const data = await fetchAllSponsor();
-    setSponsor(data);
-    setViewSponsor(false);
-  } catch (err: any) {
-    console.error(err.message || "Activation failed");
-  } finally {
-    setActivating(false);
-  }
-};
+  const handleActivate = async () => {
+    if (!selectedSponsor) return;
+    setActivating(true);
+    try {
+      await activateSponsorApi(selectedSponsor.id);
+      // refresh the sponsor list
+      const data = await fetchAllSponsor();
+      setSponsor(data);
+      setViewSponsor(false);
+    } catch (err: any) {
+      console.error(err.message || "Activation failed");
+    } finally {
+      setActivating(false);
+    }
+  };
 
   // ─── Shared styles ─────────────────────────────────────────────────────────
   const cardSx = {
@@ -384,9 +377,8 @@ const handleActivate = async () => {
     <div>
       <Box
         sx={{
-          p: "28px 32px",
+          p: "24px 28px",
           background: colors.blueAccent[900],
-          minHeight: "100vh",
           overflow: "auto",
         }}
       >
@@ -717,7 +709,8 @@ const handleActivate = async () => {
                         color: colors.blueAccent[400],
                       }}
                     >
-                      {mappped_sponsor.company_name?.charAt(0).toUpperCase() ?? "?"}
+                      {mappped_sponsor.company_name?.charAt(0).toUpperCase() ??
+                        "?"}
                     </Typography>
                   </Box>
                   <Typography
@@ -761,7 +754,9 @@ const handleActivate = async () => {
                     color: colors.grey[200],
                   }}
                 >
-                  {mappped_sponsor.aua ? `$${mappped_sponsor.aua.toLocaleString()}` : "—"}
+                  {mappped_sponsor.aua
+                    ? `$${mappped_sponsor.aua.toLocaleString()}`
+                    : "—"}
                 </Typography>
 
                 {/* Status */}
@@ -775,10 +770,12 @@ const handleActivate = async () => {
                       height: "22px",
                       bgcolor:
                         mappped_sponsor.sponsorStatus === "ACTIVE"
-                          ? "#4CCEAC18"
+                          ? "#4cceac18"
                           : "#e74c3c18",
                       color:
-                        mappped_sponsor.sponsorStatus === "ACTIVE" ? "#4CCEAC" : "#ff6b6b",
+                        mappped_sponsor.sponsorStatus === "ACTIVE"
+                          ? "#4CCEAC"
+                          : "#ff6b6b",
                       border: `1px solid ${mappped_sponsor.sponsorStatus === "ACTIVE" ? "#4CCEAC33" : "#e74c3c33"}`,
                       borderRadius: "6px",
                     }}
@@ -802,64 +799,66 @@ const handleActivate = async () => {
 
                 {/* Action */}
 
-               <Box sx={{ display: "flex", gap: "8px" ,justifyContent:"center"}}>
-  {/* View Button */}
-  <Button
-    // startIcon={<VisibilityOutlinedIcon sx={{ fontSize: 14 }} />}1
-    onClick={() => {
-      setSelectedSponsor(mappped_sponsor);   // Fixed typo: mappped_sponsor → mapped_sponsor
-      setViewSponsor(true);
-    }}
-    sx={{
-      fontSize: "11px",
-      fontWeight: 600,
-      color: colors.blueAccent[400],
-      textTransform: "none",
-      px: 2,
-      py: 0.6,
-      minWidth: 0,
-      borderRadius: "7px",
-      bgcolor: `${colors.blueAccent[500]}14`,
-      border: `1px solid ${colors.blueAccent[500]}22`,
-      "&:hover": { 
-        bgcolor: `${colors.blueAccent[500]}28`,
-        borderColor: colors.blueAccent[500]
-      },
-      gap: "5px",
-    }}
-  >
-    <VisibilityOutlinedIcon sx={{ fontSize: 14 }}/>
-  </Button>
+                <Box
+                  sx={{ display: "flex", gap: "8px", justifyContent: "center" }}
+                >
+                  {/* View Button */}
+                  <Button
+                    // startIcon={<VisibilityOutlinedIcon sx={{ fontSize: 14 }} />}1
+                    onClick={() => {
+                      setSelectedSponsor(mappped_sponsor); // Fixed typo: mappped_sponsor → mapped_sponsor
+                      setViewSponsor(true);
+                    }}
+                    sx={{
+                      fontSize: "11px",
+                      fontWeight: 600,
+                      color: colors.blueAccent[400],
+                      textTransform: "none",
+                      px: 2,
+                      py: 0.6,
+                      minWidth: 0,
+                      borderRadius: "7px",
+                      bgcolor: `${colors.blueAccent[500]}14`,
+                      border: `1px solid ${colors.blueAccent[500]}22`,
+                      "&:hover": {
+                        bgcolor: `${colors.blueAccent[500]}28`,
+                        borderColor: colors.blueAccent[500],
+                      },
+                      gap: "5px",
+                    }}
+                  >
+                    <VisibilityOutlinedIcon sx={{ fontSize: 14 }} />
+                  </Button>
 
-  {/* Optional: Add Edit Button (Recommended) */}
-  <Button
-    // startIcon={<EditIcon sx={{ fontSize: 14 }} />}
-    onClick={() => {
-    console.log("Full sponsor object:", mappped_sponsor);   // ← Add this
-    console.log("Sponsor ID:", mappped_sponsor?.id);         // ← Add this
-    handleOpenEdit(mappped_sponsor);
-}}
-    sx={{
-      fontSize: "11px",
-      fontWeight: 600,
-      color: colors.grey[400],
-      textTransform: "none",
-      px: 2,
-      py: 0.6,
-      minWidth: 0,
-      borderRadius: "7px",
-      bgcolor: `${colors.primary[700]}80`,
-      border: `1px solid ${colors.primary[600]}`,
-      "&:hover": { 
-        bgcolor: `${colors.primary[600]}90`,
-        color: colors.grey[100]
-      },
-      gap: "5px",
-    }}
-  >
-    <EditIcon sx={{ fontSize: 14 }}/>
-  </Button>
-</Box>
+                  {/* Optional: Add Edit Button (Recommended) */}
+                  <Button
+                    // startIcon={<EditIcon sx={{ fontSize: 14 }} />}
+                    onClick={() => {
+                      console.log("Full sponsor object:", mappped_sponsor); // ← Add this
+                      console.log("Sponsor ID:", mappped_sponsor?.id); // ← Add this
+                      handleOpenEdit(mappped_sponsor);
+                    }}
+                    sx={{
+                      fontSize: "11px",
+                      fontWeight: 600,
+                      color: colors.grey[400],
+                      textTransform: "none",
+                      px: 2,
+                      py: 0.6,
+                      minWidth: 0,
+                      borderRadius: "7px",
+                      bgcolor: `${colors.primary[700]}80`,
+                      border: `1px solid ${colors.primary[600]}`,
+                      "&:hover": {
+                        bgcolor: `${colors.primary[600]}90`,
+                        color: colors.grey[100],
+                      },
+                      gap: "5px",
+                    }}
+                  >
+                    <EditIcon sx={{ fontSize: 14 }} />
+                  </Button>
+                </Box>
               </Box>
             ))
           )}
@@ -1413,7 +1412,12 @@ const handleActivate = async () => {
             ))}
 
             <Box
-              sx={{ display: "flex", justifyContent: "flex-end", mt: "20px", gap:"5px" }}
+              sx={{
+                display: "flex",
+                justifyContent: "flex-end",
+                mt: "20px",
+                gap: "5px",
+              }}
             >
               <Button
                 onClick={() => setViewSponsor(false)}
@@ -1422,276 +1426,360 @@ const handleActivate = async () => {
                 Close
               </Button>
 
-               <Button
-  onClick={handleActivate}
-  disabled={activating || selectedSponsor?.sponsorStatus === "ACTIVE"}
-  sx={{
-    ...actionBtnSx,
-    px: 3,
-    bgcolor: selectedSponsor?.sponsorStatus === "ACTIVE" 
-      ? "transparent" 
-      : "#4CCEAC18",
-    color: selectedSponsor?.sponsorStatus === "ACTIVE" 
-      ? colors.grey[500] 
-      : "#4CCEAC",
-    border: `1px solid ${selectedSponsor?.sponsorStatus === "ACTIVE" 
-      ? colors.grey[700] 
-      : "#4CCEAC33"}`,
-    "&:hover": {
-      bgcolor: selectedSponsor?.sponsorStatus === "ACTIVE" 
-        ? "transparent" 
-        : "#4CCEAC28",
-    },
-  }}
->
-  {activating ? "Activating..." : selectedSponsor?.sponsorStatus === "ACTIVE" ? "Activated" : "Activate"}
-</Button>
+              <Button
+                onClick={handleActivate}
+                disabled={
+                  activating || selectedSponsor?.sponsorStatus === "ACTIVE"
+                }
+                sx={{
+                  ...actionBtnSx,
+                  px: 3,
+                  bgcolor:
+                    selectedSponsor?.sponsorStatus === "ACTIVE"
+                      ? "transparent"
+                      : "#4CCEAC18",
+                  color:
+                    selectedSponsor?.sponsorStatus === "ACTIVE"
+                      ? colors.grey[500]
+                      : "#4CCEAC",
+                  border: `1px solid ${
+                    selectedSponsor?.sponsorStatus === "ACTIVE"
+                      ? colors.grey[700]
+                      : "#4CCEAC33"
+                  }`,
+                  "&:hover": {
+                    bgcolor:
+                      selectedSponsor?.sponsorStatus === "ACTIVE"
+                        ? "transparent"
+                        : "#4CCEAC28",
+                  },
+                }}
+              >
+                {activating
+                  ? "Activating..."
+                  : selectedSponsor?.sponsorStatus === "ACTIVE"
+                    ? "Activated"
+                    : "Activate"}
+              </Button>
             </Box>
           </Box>
         )}
       </Dialog>
 
-{/* ── Edit Sponsor Dialog ──────────────────────────────────────────────── */}
-<Dialog
-  open={editSponsorDialog}
-  onClose={() => setEditSponsorDialog(false)}
-  fullWidth
-  maxWidth="sm"
-  PaperProps={{
-    sx: {
-      borderRadius: "16px",
-      backgroundColor: colors.primary[400],
-      border: `1px solid ${colors.primary[300]}44`,
-      color: colors.grey[100],
-      boxShadow: "0 24px 64px rgba(0,0,0,0.4)",
-    },
-  }}
->
-  {copyEditSponsor && (
-    <Box sx={{ p: 3 }}>
-      {/* Header - Same style as View Dialog */}
-      <Box sx={{ display: "flex", alignItems: "center", gap: "14px", mb: "24px" }}>
-        <Box
-          sx={{
-            width: 46,
-            height: 46,
-            borderRadius: "12px",
-            bgcolor: `${colors.blueAccent[500]}22`,
-            border: `1px solid ${colors.blueAccent[500]}33`,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Typography sx={{ fontSize: "18px", fontWeight: 700, color: colors.blueAccent[400] }}>
-            {copyEditSponsor.company_name?.charAt(0).toUpperCase()}
-          </Typography>
-        </Box>
-        <Box>
-          <Typography sx={{ fontSize: "17px", fontWeight: 700, color: colors.grey[100] }}>
-            Edit Sponsor
-          </Typography>
-          <Typography sx={{ fontSize: "13px", color: colors.grey[400] }}>
-            {copyEditSponsor.company_name}
-          </Typography>
-        </Box>
-      </Box>
-
-      <form>
-        <Stack spacing={2.5}>
-          {/* Company & Plan Section */}
-          <Typography sx={{ fontSize: "11px", fontWeight: 700, color: colors.grey[400], letterSpacing: "0.8px", textTransform: "uppercase", mb: 1 }}>
-            COMPANY & PLAN DETAILS
-          </Typography>
-
-          <TextField
-            fullWidth
-            label="Company Name"
-            name="company_name"
-            value={copyEditSponsor.company_name || ""}
-            onChange={handleEditSponsorChange}
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                // backgroundColor: colors.primary[500],
-                color: colors.grey[100],
-              },
-            }}
-          />
-
-          <TextField
-            fullWidth
-            label="EIN"
-            name="ein"
-            value={copyEditSponsor.ein || ""}
-            onChange={handleEditSponsorChange}
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                // backgroundColor: colors.primary[500],
-                color: colors.grey[100],
-              },
-            }}
-          />
-
-          <TextField
-            fullWidth
-            label="Plan Type"
-            name="plan_type"
-            value={copyEditSponsor.plan_type || ""}
-            onChange={handleEditSponsorChange}
-          />
-
-          <TextField
-            fullWidth
-            label="Match Formula"
-            name="match_formula"
-            value={copyEditSponsor.match_formula || ""}
-            onChange={handleEditSponsorChange}
-          />
-
-          <TextField
-            fullWidth
-            label="Vesting Schedule"
-            name="vesting_schedule"
-            value={copyEditSponsor.vesting_schedule || ""}
-            onChange={handleEditSponsorChange}
-          />
-
-          {/* Safe Harbour Plan - Radio Buttons */}
-          <FormControl fullWidth>
-            <FormLabel sx={{ color: colors.grey[400], fontSize: "12px", mb: 1 }}>
-              Safe Harbour Plan
-            </FormLabel>
-            <RadioGroup
-              row
-              name="safe_harbour_plan"
-              value={copyEditSponsor.safe_harbour_plan || "NO"}
-              onChange={handleEditSponsorChange}
+      {/* ── Edit Sponsor Dialog ──────────────────────────────────────────────── */}
+      <Dialog
+        open={editSponsorDialog}
+        onClose={() => setEditSponsorDialog(false)}
+        fullWidth
+        maxWidth="sm"
+        PaperProps={{
+          sx: {
+            borderRadius: "16px",
+            backgroundColor: colors.primary[400],
+            border: `1px solid ${colors.primary[300]}44`,
+            color: colors.grey[100],
+            boxShadow: "0 24px 64px rgba(0,0,0,0.4)",
+          },
+        }}
+      >
+        {copyEditSponsor && (
+          <Box sx={{ p: 3 }}>
+            {/* Header - Same style as View Dialog */}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: "14px",
+                mb: "24px",
+              }}
             >
-              <FormControlLabel value="YES" control={<Radio />} label="Yes" />
-              <FormControlLabel value="NO" control={<Radio />} label="No" />
-            </RadioGroup>
-          </FormControl>
+              <Box
+                sx={{
+                  width: 46,
+                  height: 46,
+                  borderRadius: "12px",
+                  bgcolor: `${colors.blueAccent[500]}22`,
+                  border: `1px solid ${colors.blueAccent[500]}33`,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontSize: "18px",
+                    fontWeight: 700,
+                    color: colors.blueAccent[400],
+                  }}
+                >
+                  {copyEditSponsor.company_name?.charAt(0).toUpperCase()}
+                </Typography>
+              </Box>
+              <Box>
+                <Typography
+                  sx={{
+                    fontSize: "17px",
+                    fontWeight: 700,
+                    color: colors.grey[100],
+                  }}
+                >
+                  Edit Sponsor
+                </Typography>
+                <Typography sx={{ fontSize: "13px", color: colors.grey[400] }}>
+                  {copyEditSponsor.company_name}
+                </Typography>
+              </Box>
+            </Box>
 
-          <TextField
-            fullWidth
-            label="Plan Start Date"
-            name="plan_start_date"
-            value={copyEditSponsor.plan_start_date || ""}
-            onChange={handleEditSponsorChange}
-            placeholder="YYYY-MM-DD"
-          />
+            <form>
+              <Stack spacing={2.5}>
+                {/* Company & Plan Section */}
+                <Typography
+                  sx={{
+                    fontSize: "11px",
+                    fontWeight: 700,
+                    color: colors.grey[400],
+                    letterSpacing: "0.8px",
+                    textTransform: "uppercase",
+                    mb: 1,
+                  }}
+                >
+                  COMPANY & PLAN DETAILS
+                </Typography>
 
-          {/* Contact Section */}
-          <Typography sx={{ fontSize: "11px", fontWeight: 700, color: colors.grey[400], letterSpacing: "0.8px", textTransform: "uppercase", mt: 2, mb: 1 }}>
-            PRIMARY CONTACT
-          </Typography>
+                <TextField
+                  fullWidth
+                  label="Company Name"
+                  name="company_name"
+                  value={copyEditSponsor.company_name || ""}
+                  onChange={handleEditSponsorChange}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      // backgroundColor: colors.primary[500],
+                      color: colors.grey[100],
+                    },
+                  }}
+                />
 
-          <TextField
-            fullWidth
-            label="Contact Name"
-            name="primaryContactName"
-            value={copyEditSponsor.primaryContactName || ""}
-            onChange={handleEditSponsorChange}
-          />
+                <TextField
+                  fullWidth
+                  label="EIN"
+                  name="ein"
+                  value={copyEditSponsor.ein || ""}
+                  onChange={handleEditSponsorChange}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      // backgroundColor: colors.primary[500],
+                      color: colors.grey[100],
+                    },
+                  }}
+                />
 
-          <TextField
-            fullWidth
-            label="Contact Email"
-            name="primaryContactEmail"
-            value={copyEditSponsor.primaryContactEmail || ""}
-            onChange={handleEditSponsorChange}
-          />
+                <TextField
+                  fullWidth
+                  label="Plan Type"
+                  name="plan_type"
+                  value={copyEditSponsor.plan_type || ""}
+                  onChange={handleEditSponsorChange}
+                />
 
-          <TextField
-            fullWidth
-            label="Contact Phone"
-            name="primary_contact_phone"
-            value={copyEditSponsor.primary_contact_phone || ""}
-            onChange={handleEditSponsorChange}
-          />
+                <TextField
+                  fullWidth
+                  label="Match Formula"
+                  name="match_formula"
+                  value={copyEditSponsor.match_formula || ""}
+                  onChange={handleEditSponsorChange}
+                />
 
-          {/* Address Section */}
-          <Typography sx={{ fontSize: "11px", fontWeight: 700, color: colors.grey[400], letterSpacing: "0.8px", textTransform: "uppercase", mt: 2, mb: 1 }}>
-            ADDRESS
-          </Typography>
+                <TextField
+                  fullWidth
+                  label="Vesting Schedule"
+                  name="vesting_schedule"
+                  value={copyEditSponsor.vesting_schedule || ""}
+                  onChange={handleEditSponsorChange}
+                />
 
-          <TextField
-            fullWidth
-            label="Address Line 1"
-            name="addressLine1"
-            value={copyEditSponsor.addressLine1 || ""}
-            onChange={handleEditSponsorChange}
-          />
+                {/* Safe Harbour Plan - Radio Buttons */}
+                <FormControl fullWidth>
+                  <FormLabel
+                    sx={{ color: colors.grey[400], fontSize: "12px", mb: 1 }}
+                  >
+                    Safe Harbour Plan
+                  </FormLabel>
+                  <RadioGroup
+                    row
+                    name="safe_harbour_plan"
+                    value={copyEditSponsor.safe_harbour_plan || "NO"}
+                    onChange={handleEditSponsorChange}
+                  >
+                    <FormControlLabel
+                      value="YES"
+                      control={<Radio />}
+                      label="Yes"
+                    />
+                    <FormControlLabel
+                      value="NO"
+                      control={<Radio />}
+                      label="No"
+                    />
+                  </RadioGroup>
+                </FormControl>
 
-          <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
-            <TextField
-              fullWidth
-              label="City"
-              name="city"
-              value={copyEditSponsor.city || ""}
-              onChange={handleEditSponsorChange}
-            />
-            <TextField
-              fullWidth
-              label="State"
-              name="state"
-              value={copyEditSponsor.state || ""}
-              onChange={handleEditSponsorChange}
-            />
+                <TextField
+                  fullWidth
+                  label="Plan Start Date"
+                  name="plan_start_date"
+                  value={copyEditSponsor.plan_start_date || ""}
+                  onChange={handleEditSponsorChange}
+                  placeholder="YYYY-MM-DD"
+                />
+
+                {/* Contact Section */}
+                <Typography
+                  sx={{
+                    fontSize: "11px",
+                    fontWeight: 700,
+                    color: colors.grey[400],
+                    letterSpacing: "0.8px",
+                    textTransform: "uppercase",
+                    mt: 2,
+                    mb: 1,
+                  }}
+                >
+                  PRIMARY CONTACT
+                </Typography>
+
+                <TextField
+                  fullWidth
+                  label="Contact Name"
+                  name="primaryContactName"
+                  value={copyEditSponsor.primaryContactName || ""}
+                  onChange={handleEditSponsorChange}
+                />
+
+                <TextField
+                  fullWidth
+                  label="Contact Email"
+                  name="primaryContactEmail"
+                  value={copyEditSponsor.primaryContactEmail || ""}
+                  onChange={handleEditSponsorChange}
+                />
+
+                <TextField
+                  fullWidth
+                  label="Contact Phone"
+                  name="primary_contact_phone"
+                  value={copyEditSponsor.primary_contact_phone || ""}
+                  onChange={handleEditSponsorChange}
+                />
+
+                {/* Address Section */}
+                <Typography
+                  sx={{
+                    fontSize: "11px",
+                    fontWeight: 700,
+                    color: colors.grey[400],
+                    letterSpacing: "0.8px",
+                    textTransform: "uppercase",
+                    mt: 2,
+                    mb: 1,
+                  }}
+                >
+                  ADDRESS
+                </Typography>
+
+                <TextField
+                  fullWidth
+                  label="Address Line 1"
+                  name="addressLine1"
+                  value={copyEditSponsor.addressLine1 || ""}
+                  onChange={handleEditSponsorChange}
+                />
+
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: 2,
+                  }}
+                >
+                  <TextField
+                    fullWidth
+                    label="City"
+                    name="city"
+                    value={copyEditSponsor.city || ""}
+                    onChange={handleEditSponsorChange}
+                  />
+                  <TextField
+                    fullWidth
+                    label="State"
+                    name="state"
+                    value={copyEditSponsor.state || ""}
+                    onChange={handleEditSponsorChange}
+                  />
+                </Box>
+
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: 2,
+                  }}
+                >
+                  <TextField
+                    fullWidth
+                    label="Zipcode"
+                    name="zipcode"
+                    value={copyEditSponsor.zipcode || ""}
+                    onChange={handleEditSponsorChange}
+                  />
+                  <TextField
+                    fullWidth
+                    label="Country"
+                    name="country"
+                    value={copyEditSponsor.country || ""}
+                    onChange={handleEditSponsorChange}
+                  />
+                </Box>
+              </Stack>
+            </form>
+
+            {/* Action Buttons */}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "flex-end",
+                mt: "28px",
+                gap: "10px",
+              }}
+            >
+              <Button
+                onClick={() => setEditSponsorDialog(false)}
+                sx={{
+                  color: colors.grey[400],
+                  fontWeight: 600,
+                  px: 4,
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                onClick={handleUpdateSponsor}
+                sx={{
+                  bgcolor: colors.blueAccent[500],
+                  color: "#fff",
+                  fontWeight: 600,
+                  px: 4,
+                  "&:hover": { bgcolor: colors.blueAccent[600] },
+                }}
+              >
+                {isUpdating ? "Updating..." : "Save Changes"}
+              </Button>
+            </Box>
           </Box>
-
-          <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
-            <TextField
-              fullWidth
-              label="Zipcode"
-              name="zipcode"
-              value={copyEditSponsor.zipcode || ""}
-              onChange={handleEditSponsorChange}
-            />
-            <TextField
-              fullWidth
-              label="Country"
-              name="country"
-              value={copyEditSponsor.country || ""}
-              onChange={handleEditSponsorChange}
-            />
-          </Box>
-        </Stack>
-      </form>
-
-      {/* Action Buttons */}
-      <Box sx={{ display: "flex", justifyContent: "flex-end", mt: "28px", gap: "10px" }}>
-        <Button
-          onClick={() => setEditSponsorDialog(false)}
-          sx={{
-            color: colors.grey[400],
-            fontWeight: 600,
-            px: 4,
-          }}
-        >
-          Cancel
-        </Button>
-        <Button
-          variant="contained"
-          onClick={handleUpdateSponsor}   
-          sx={{
-            bgcolor: colors.blueAccent[500],
-            color: "#fff",
-            fontWeight: 600,
-            px: 4,
-            "&:hover": { bgcolor: colors.blueAccent[600] },
-          }}
-        >
-         {isUpdating? "Updating..." : "Save Changes"} 
-        </Button>
-      </Box>
-    </Box>
-  )}
-</Dialog>
-
-
-
-
+        )}
+      </Dialog>
     </div>
   );
 };

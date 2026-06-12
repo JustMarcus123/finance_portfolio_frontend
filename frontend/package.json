@@ -13,14 +13,18 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.3.9",
-    "@mui/material": "^7.3.9",
+    "@mui/material": "^7.3.11",
     "@mui/x-data-grid": "^8.27.5",
     "@reduxjs/toolkit": "^2.11.2",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
+    "@rolldown/binding-darwin-arm64": "^1.1.0",
+    "chart.js": "^4.5.1",
+    "react": "^18.3.1",
+    "react-chartjs-2": "^5.3.1",
+    "react-dom": "^18.3.1",
     "react-pro-sidebar": "^1.1.0",
     "react-redux": "^9.2.0",
-    "react-router-dom": "^7.13.1"
+    "react-router-dom": "^7.13.1",
+    "recharts": "^3.8.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
@@ -36,5 +40,10 @@
     "globals": "^17.4.0",
     "typescript": "~5.9.3",
     "vite": "^8.0.0"
+  },
+  "overrides": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-is": "^18.3.1"
   }
 }
