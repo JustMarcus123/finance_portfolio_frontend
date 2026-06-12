@@ -13,6 +13,17 @@ import PlanManagement from "./Scenes/PlanManagement/PlanManagement";
 import EmployerDashboard from "./Scenes/Employer/Dashboard";
 import EmployerSideBar from "./Scenes/global/employerSideBar";
 import Participants from "./Scenes/Employer/Participants";
+import EmployeeDashboard from "./Scenes/Employees/Dashboard";
+import EmployeeSideBar from "./Scenes/global/employeeSidebar";
+import Networth from "./Scenes/Employees/networth";
+import PayrollPage from "./Scenes/Employer/Payroll";
+import My401k from "./Scenes/Employees/My401k";
+import Contributions from "./Scenes/Employees/Contributions";
+import PlanLoans from "./Scenes/Employees/PlanLoans";
+import FundAllocations from "./Scenes/Employees/Fundallocations";
+import ContributionHistory from "./Scenes/Employer/ContributionHistory";
+import LoanRequests from "./Scenes/Employer/LoanRequests";
+import Compliance from "./Scenes/Employer/Compliance";
 
 // ── Super Admin Layout ────────────────────────────────────────────────────────
 const AdminLayout = () => {
@@ -45,13 +56,39 @@ const EmployerLayout = () => {
         <Routes>
           <Route path="/" element={<EmployerDashboard />} />
           <Route path="/participants" element={<Participants/>}/>
-
+          <Route path="/payrole" element={<PayrollPage/>}/>
+          <Route path="/contributions" element={<ContributionHistory/>}/>
+          <Route path="/loanRequest" element={<LoanRequests/>}/>
+          <Route path="/compliance" element={<Compliance/>}/>
           {/* Add more employer routes here */}
         </Routes>
       </main>
     </div>
   );
 };
+
+//----------Employee layout ------------
+const EmployeeLayout =()=>{
+
+  const [isSidebar, setIsSidebar] = useState<boolean>(true)
+
+  return(
+    <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
+      <EmployeeSideBar isSidebar={isSidebar} />   {/* swap with EmployerSidebar later */}
+      <main style={{ flex: 1, overflow: "auto", display: "flex", flexDirection: "column" }}>
+         <Topbar setIsSidebar={setIsSidebar} />
+        <Routes>
+          <Route path="/" element={<EmployeeDashboard />} />
+          <Route path="/networth" element={<Networth/>}/>
+          <Route path="/my401k" element={<My401k/>}/>
+          <Route path="/contributions" element={<Contributions/>}/>
+          <Route path="/planloan" element={<PlanLoans/>}/>
+          <Route path="/fundallocation" element={<FundAllocations/>}/>
+        </Routes>
+      </main>
+    </div>
+  )
+}
 
 // ── App ───────────────────────────────────────────────────────────────────────
 function App() {
@@ -75,6 +112,12 @@ function App() {
             {/* Employer Admin only */}
             <Route element={<ProtectedRoute requiredRole="EMPLOYER_ADMIN" />}>
               <Route path="/employer/dashboard/*" element={<EmployerLayout />} />
+            </Route>
+
+            {/* Employee only */}
+            <Route element={<ProtectedRoute requiredRole="EMPLOYEE"/>}>
+            <Route path="/employee/dashboard/*"  element={<EmployeeLayout/>} />
+
             </Route>
 
             {/* Catch-all */}

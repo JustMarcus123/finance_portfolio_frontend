@@ -100,7 +100,6 @@ const request=async<T>(method: string,  path:string, body?:unknown, authenticate
     const err = data as { message?: string };
     throw new Error(err.message ?? `Request failed (${res.status})`);
   }
-
   
     return data as T
 

@@ -15,6 +15,7 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import LockOutlinedIcon from '@mui/icons-material/LockOutline';
 import ListAltIcon from '@mui/icons-material/ListAlt';
+import { useAuth } from "../../context/AuthContext";
 
 
 
@@ -46,11 +47,17 @@ const Item = ({ title, to, icon, selected, setSelected }: itemProps) => {
   );
 };
 
-const EmployerSideBar = ({ isSidebar }: SidebarProps) => {
+const EmployeeSideBar = ({ isSidebar }: SidebarProps) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
+
+
+    //mapping the user
+    const {user} = useAuth();
+
+   
 
   return (
     <Box
@@ -113,7 +120,7 @@ const EmployerSideBar = ({ isSidebar }: SidebarProps) => {
                 ml="15px"
               >
                 <Typography variant="h3" color={colors.grey[100]}>
-                  Admin
+                   {user?.role}
                 </Typography>
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                   <MenuOutlinedIcon />
@@ -152,10 +159,10 @@ const EmployerSideBar = ({ isSidebar }: SidebarProps) => {
                 fontWeight="bold"
                 sx={{ m: "4px 0 2px 0" }}
               >
-                Employer
+                Employee
               </Typography>
               <Typography variant="h5" color={colors.greenAccent[500]}>
-                Admin
+                {/* Admin */}
               </Typography>
             </Box>
           )}
@@ -163,65 +170,90 @@ const EmployerSideBar = ({ isSidebar }: SidebarProps) => {
           {/* ── Nav items ── */}
         <Box paddingLeft={isCollapsed ? undefined : "10px"}>
             <Item
-  title="Overview"
-  to="/employer/dashboard"
+  title="Dashboard"
+  to="/employee/dashboard"
   icon={<DashboardIcon/>}
   selected={selected}
   setSelected={setSelected}
 />
 <Item
-  title="Participants"
-  to="/employer/dashboard/participants"
+  title="Net Worth"
+  to="/employee/dashboard/networth"
   icon={<PeopleOutlinedIcon />}
   selected={selected}
   setSelected={setSelected}
 />
 <Item
-  title="Payroll Upload"
-  to="/employer/dashboard/payrole"
+  title="My 401(K)"
+  to="/employee/dashboard/my401k"
   icon={<PaymentIcon />}
   selected={selected}
   setSelected={setSelected}
 />
 <Item
   title="Contributions"
-  to="/employer/dashboard/contributions"
+  to="/employee/dashboard/contributions"
   icon={<AttachMoneyIcon />}
   selected={selected}
   setSelected={setSelected}
 />
 <Item
-  title="Loan Request"
-  to="/employer/dashboard/loanRequest"
+  title="Plan Loan"
+  to="/employee/dashboard/planloan"
   icon={<AccountBalanceIcon />}
   selected={selected}
   setSelected={setSelected}
 />
 <Item
-  title="Compliance"
-  to="/employer/dashboard/compliance"
+  title="Fund Allocation"
+  to="/employee/dashboard/fundallocation"
   icon={<EventNoteIcon />}
   selected={selected}
   setSelected={setSelected}
 />
 <Item
-  title="Vesting"
-  to="/employer/dashboard/vesting"
+  title="Transaction"
+  to="/employee/dashboard/transaction"
   icon={<LockOutlinedIcon />}
   selected={selected}
   setSelected={setSelected}
 />
 <Item
-  title="Analytics"
-  to="/employer/dashboard/auditlogs"
+  title="Budget"
+  to="/employee/dashboard/budget"
   icon={<BarChartOutlinedIcon />}
   selected={selected}
   setSelected={setSelected}
 />
 
 <Item
-  title="Enrollment"
-  to="/employer/dashboard/enrollment"
+  title="Goals"
+  to="/employee/dashboard/goals"
+  icon={<ListAltIcon />}
+  selected={selected}
+  setSelected={setSelected}
+/>
+
+<Item
+  title="Debt Paydown"
+  to="/employee/dashboard/debtpaydown"
+  icon={<ListAltIcon />}
+  selected={selected}
+  setSelected={setSelected}
+/>
+
+
+<Item
+  title="ALerts"
+  to="/employee/dashboard/alerts"
+  icon={<ListAltIcon />}
+  selected={selected}
+  setSelected={setSelected}
+/>
+
+<Item
+  title="Settings"
+  to="/employee/dashboard/settings"
   icon={<ListAltIcon />}
   selected={selected}
   setSelected={setSelected}
@@ -233,7 +265,7 @@ const EmployerSideBar = ({ isSidebar }: SidebarProps) => {
   );
 };
 
-export default EmployerSideBar;
+export default EmployeeSideBar;
 
 
 

@@ -26,3 +26,21 @@ export const CreateEmployeeApi = async(data:CreateEmployeeTypes)=>{
     return await response.json();
 
 }
+
+
+export const GetAllEmployees =async()=>{
+
+    const data = await fetch(`${BASE_URL}/api/employee/fetch`,{
+        method: "GET",
+        headers: {"content-type": "application/json",
+          "Authorization":`Bearer ${localStorage.getItem("accessToken")}`},
+    })
+    if(!data.ok){
+        throw new Error("fetching fail");
+    } 
+
+
+
+    return await data.json()
+
+}   
