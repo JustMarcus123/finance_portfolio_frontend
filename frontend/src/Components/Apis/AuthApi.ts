@@ -1,30 +1,27 @@
-
-import TokenStorage from "../../context/TokenStorage";
+// AuthApi.ts
 
 import BASE_URL from "../../config/api";
 
-export interface AuthResponse{
-    accessToken: string;
-    refreshToken: string;
-    email: string;
-    message:string
+export interface AuthResponse {
+  email: string;
+  firstName: string;
+  role: string;
+  message: string;
 }
 
-// ── Silent Refresh Logic ──────────────────────────────────────────────────────
-const tryRefreshToken = async (): Promise<boolean> => {
-  const refreshToken = TokenStorage.getRefresh();
-  if (!refreshToken) {
-    console.log("→ [Refresh] No refresh token available");
-    return false;
-  }
+export interface MeResponse {
+  email: string;
+  firstName: string;
+  role: string;
+}
 
+// ── Silent Refresh ────────────────────────────────────────────────────────────
+const tryRefreshToken = async (): Promise<boolean> => {
   try {
     console.log("→ [Refresh] Attempting silent refresh...");
-
     const res = await fetch(`${BASE_URL}/api/auth/refresh`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refreshToken }),
+      credentials: "include",
     });
 
     if (!res.ok) {
@@ -32,58 +29,45 @@ const tryRefreshToken = async (): Promise<boolean> => {
       return false;
     }
 
-    const data: AuthResponse = await res.json();
-    TokenStorage.setAccess(data.accessToken);
-
-    console.log("→ [Refresh] New access token stored successfully ✅");
+    console.log("→ [Refresh] Token refreshed successfully ✅");
     return true;
   } catch (err) {
-    console.error("→ [Refresh] Network error during refresh:", err);
+    console.error("→ [Refresh] Network error:", err);
     return false;
   }
 };
 
-//request wrapper
-const request=async<T>(method: string,  path:string, body?:unknown, authenticated=false, isRetry=false): Promise<T> =>{
+// ── Request Wrapper ───────────────────────────────────────────────────────────
+export const request = async <T>(
+  method: string,
+  path: string,
+  body?: unknown,
+  isRetry = false
+): Promise<T> => {
+  const url = `${BASE_URL}${path}`;
 
-    const url = `${BASE_URL}${path}`;
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      method,
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+  } catch (error) {
+    throw new Error("Cannot connect to server. Please check your internet.");
+  }
 
-    const headers: Record<string, string>={
-        "Content-type":"application/json",
-
-    };
-
-    if(authenticated){
-        const token = TokenStorage.getAccess();
-
-        if(token){
-            headers["Authorization"] =`Bearer ${token}`;
-        }
-    }
-
-    let res: Response;
-    try {
-        res = await fetch (url,{
-            method, headers,body:body ? JSON.stringify(body) : undefined,
-
-        });
-    } catch (error) {
-        console.error("netWork error", error);
-        throw new Error("cannot connect to server. please check your internet");
-
-    }
-
-    // Auto refresh on 401
-  if (res.status === 401 && authenticated && !isRetry) {
-    console.log("→ [API] Received 401 — attempting silent refresh...");
+  // ✅ auto refresh on 401
+  if (res.status === 401 && !isRetry) {
+    console.log("→ [API] 401 received — attempting silent refresh...");
     const refreshed = await tryRefreshToken();
 
     if (refreshed) {
-      return request<T>(method, path, body, authenticated, true); // retry once
+      return request<T>(method, path, body, true); // retry once with new cookie
     }
 
-    // Refresh failed → force logout
-    TokenStorage.clearAll();
+    // refresh failed — session is dead
     window.location.href = "/login";
     throw new Error("Session expired. Please login again.");
   }
@@ -100,18 +84,43 @@ const request=async<T>(method: string,  path:string, body?:unknown, authenticate
     const err = data as { message?: string };
     throw new Error(err.message ?? `Request failed (${res.status})`);
   }
-  
-    return data as T
 
-}
+  return data as T;
+};
 
+// ── getMeApi — separate, no refresh loop ─────────────────────────────────────
+export const getMeApi = async (): Promise<MeResponse | null> => {
+  try {
+    const res = await fetch(`${BASE_URL}/api/auth/me`, {
+      credentials: "include",
+    });
 
- export const loginApi =(email:string, password:string)=>
-   request<AuthResponse>("POST","/api/auth/login",{email, password});
+    if (res.status === 401) {
+      // ✅ access token expired on page load — try refresh once
+      console.log("→ [Me] 401 on /me — trying refresh...");
+      const refreshed = await tryRefreshToken();
 
-export const logoutApi = (refreshToken: string) =>
-    request<void>("POST", "/api/auth/logout", { refreshToken });
+      if (refreshed) {
+        // retry /me with new access token cookie
+        const retryRes = await fetch(`${BASE_URL}/api/auth/me`, {
+          credentials: "include",
+        });
+        if (retryRes.ok) return await retryRes.json();
+      }
 
+      return null; // refresh failed — no session
+    }
 
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+};
 
+// ── Auth API calls ────────────────────────────────────────────────────────────
+export const loginApi = (email: string, password: string) =>
+  request<AuthResponse>("POST", "/api/auth/login", { email, password });
 
+export const logoutApi = () =>
+  request<void>("POST", "/api/auth/logout");
