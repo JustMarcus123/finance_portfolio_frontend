@@ -32,8 +32,9 @@ export const GetAllEmployees =async()=>{
 
     const data = await fetch(`${BASE_URL}/api/employee/fetch`,{
         method: "GET",
-        headers: {"content-type": "application/json",
-          "Authorization":`Bearer ${localStorage.getItem("accessToken")}`},
+        credentials:"include",
+        headers: {"content-type": "application/json"
+         },
     })
     if(!data.ok){
         throw new Error("fetching fail");

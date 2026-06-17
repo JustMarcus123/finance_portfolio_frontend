@@ -6,7 +6,7 @@ import { Navigate, Outlet } from "react-router-dom";
 
 
 const ProtectedRoute = ({ requiredRole }: { requiredRole?: string }) => {
-    const { token, isLoading, user } = useAuth();
+    const { isLoading, user } = useAuth();
 
     if (isLoading) {
         return (
@@ -16,7 +16,7 @@ const ProtectedRoute = ({ requiredRole }: { requiredRole?: string }) => {
         );
     }
 
-    if (!token || !user) {
+    if ( !user) {
         console.log("No valid session, redirecting to /login");
         return <Navigate to="/login" replace />;
     }
