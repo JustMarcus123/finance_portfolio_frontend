@@ -49,6 +49,8 @@ interface StatCard {
 
 interface employee401kBalanceType{
   balance: string;
+  email:string;
+  YTDContribution:string
 }
 
 interface GrowthDataset {
@@ -273,7 +275,7 @@ const EmployeeDashboard: React.FC = () => {
   const [load401kBalance, setLoad401kBalance] = useState(false);
   const [employee401kBalance , setEmployee401kBalance] = useState<employee401kBalanceType | null>(null);
 
-
+console.log(employee401kBalance);
 
   //fetching the 401(K) balance
 useEffect(()=>{
@@ -300,6 +302,7 @@ getBalance();
 
 
 
+
 const statCards: StatCard[] = [
   {
     label: "401(K) BALANCE",
@@ -312,7 +315,7 @@ const statCards: StatCard[] = [
   },
   {
     label: "TOTAL NET WORTH",
-    value: "$296,520",
+    value: load401kBalance ? "loading..." : `$${employee401kBalance?.balance?.toLocaleString() ?? "0"}`,
     change: "+$14,200 this month",
     sub: "All accounts combined",
     positive: true,
@@ -320,7 +323,8 @@ const statCards: StatCard[] = [
   },
   {
     label: "YTD CONTRIBUTIONS",
-    value: "$8,400",
+        value: load401kBalance ? "loading..." : `$${employee401kBalance?.YTDContribution?.toLocaleString() ?? "0"}`,
+
     change: "On track",
     sub: "You: $5,600 · Employer: $2,800",
     positive: true,

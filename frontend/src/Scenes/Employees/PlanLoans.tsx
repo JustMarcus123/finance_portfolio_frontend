@@ -5,10 +5,24 @@ import {
   Button,
   LinearProgress,
   Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
+  TextField,
+  MenuItem,
+  InputAdornment,
 } from "@mui/material";
 import { tokens } from "../../theme";
 import AddIcon from "@mui/icons-material/Add";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+import CloseIcon from "@mui/icons-material/Close";
+import { useEffect, useState } from "react";
+import { LoanRequestApi } from "./API/LoanRequestApi";
+import { fetchingLoanApi } from "./API/FetchLoanApi";
+
+
 
 // ── static data ───────────────────────────────────────────────────────────────
 const summaryCards = [
@@ -56,6 +70,35 @@ const repaymentHistory = [
   { date: "Jan 31, 2025", loanId: "LOAN-2024-001", payment: "$192.00", principal: "$152.21", interest: "$39.79", remaining: "$8,506.53" },
 ];
 
+const loanPurposes = [
+  "General Purpose",
+  "Primary Residence",
+  "Education Expenses",
+  "Medical Expenses",
+  "Debt Consolidation",
+];
+
+const repaymentTerms = [
+  { value: "12", label: "12 months(20 % yearly)" },
+  { value: "24", label: "24 months (20 % yearly)" },
+  { value: "36", label: "36 months" },
+  { value: "48", label: "48 months" },
+  { value: "60", label: "60 months (max — primary residence only)" },
+];
+
+
+// data type for plan loans
+interface loanTypes{
+  id:number,
+  loanAmount:string,
+  loanType:string,
+  repaymentTerm:string,
+  loanId: string,
+  requestedTime: string,
+  status:"PENDING" | "APPROVED" | "REJECTED"
+}
+
+
 // ── component ──────────────────────────────────────────────────────────────────
 const PlanLoans = () => {
   const theme = useTheme();
@@ -70,6 +113,85 @@ const PlanLoans = () => {
     "&:hover": { transform: "translateY(-2px)", boxShadow: "0 8px 24px rgba(0,0,0,0.25)" },
   };
 
+
+
+
+  const inputSx = {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "8px",
+      backgroundColor: colors.primary[700] + "44",
+      fontSize: "13px",
+      "& fieldset": { borderColor: `${colors.primary[300]}33` },
+      "&:hover fieldset": { borderColor: `${colors.primary[300]}66` },
+      "&.Mui-focused fieldset": { borderColor: "#4fc3f7" },
+    },
+    "& .MuiInputLabel-root": { color: colors.grey[500], fontSize: "13px" },
+    "& .MuiInputLabel-root.Mui-focused": { color: "#4fc3f7" },
+    "& .MuiOutlinedInput-input": { color: colors.grey[100] },
+    "& .MuiSvgIcon-root": { color: colors.grey[500] },
+  };
+
+    // new loan request button state
+  const [newLoanButton, setNewLoanButton] = useState(false);
+
+  // new loan form state
+  const [loanPurpose, setLoanPurpose] = useState("");
+  const [loanAmount, setLoanAmount] = useState("");
+  const [repaymentTerm, setRepaymentTerm] = useState("");
+  const [loanStatus, setLoanStatus] = useState <loanTypes[]>([]);
+
+  console.log("loan status-",loanStatus);
+
+  const availableToBorrow = 38220;
+  const amountNum = Number(loanAmount) || 0;
+  const exceedsLimit = amountNum > availableToBorrow;
+  const canSubmit = loanPurpose && amountNum > 0 && !exceedsLimit && repaymentTerm;
+
+
+  const closeAndReset = () => {
+    setNewLoanButton(false);
+    setLoanPurpose("");
+    setLoanAmount("");
+    setRepaymentTerm("");
+  };
+
+
+  //display the loan status here even using useEffect
+
+
+
+ useEffect(()=>{
+
+  const fetchLoans = async()=>{
+
+  try {
+    
+    const data = await fetchingLoanApi();
+    setLoanStatus(data);
+
+
+  } catch (error) {
+    console.error("fetching failed for new loans")
+  }
+
+}
+
+  fetchLoans()
+  
+ },[])
+
+
+ const handleSubmit = async () => {
+  try {
+     await LoanRequestApi({loanAmount, loanPurpose, repaymentTerm});
+   
+    closeAndReset();
+  } catch (error) {
+    console.error("error submitting loan request", error);
+    // consider showing an error state to the user here too
+  }
+};
+
   return (
     <Box sx={{ p: "24px 28px", overflowY: "auto" }}>
       {/* Header */}
@@ -78,11 +200,12 @@ const PlanLoans = () => {
           Plan Loans
         </Typography>
         <Button
+          onClick={() => setNewLoanButton(true)}
           variant="contained"
           size="small"
           startIcon={<AddIcon />}
           sx={{
-            backgroundColor: "#1a2744",
+            backgroundColor: "#b2bdd6",
             color: colors.grey[100],
             textTransform: "none",
             fontSize: "13px",
@@ -112,6 +235,7 @@ const PlanLoans = () => {
         ))}
       </Box>
 
+
       {/* Warning banner */}
       <Box
         sx={{
@@ -137,6 +261,68 @@ const PlanLoans = () => {
           </Typography>
         </Box>
       </Box>
+
+
+      {/* Loan Requests / Applications */}
+{loanStatus.length > 0 && (
+  <Box sx={{ ...card, mb: "20px" }}>
+    <Typography sx={{ fontSize: "14px", fontWeight: 600, color: colors.grey[100], mb: "16px" }}>
+      📋 My Loan Requests
+    </Typography>
+
+    {loanStatus.map((loan) => {
+     const statusColors = {
+  PENDING: { bg: "#f0a50011", border: "#f0a50033", text: "#f0a500" },
+  APPROVED: { bg: "#4CCEAC11", border: "#4CCEAC33", text: "#4CCEAC" },
+  REJECTED: { bg: "#f4433611", border: "#f4433633", text: "#f44336" },
+};
+
+const sc = statusColors[loan.status] ?? {
+  bg: colors.primary[700],
+  border: `${colors.primary[300]}33`,
+  text: colors.grey[400],
+};
+
+      return (
+        <Box
+          key={loan.id}
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            backgroundColor: colors.primary[700] + "44",
+            border: `1px solid ${colors.primary[300]}33`,
+            borderRadius: "10px",
+            p: "14px 18px",
+            mb: "10px",
+          }}
+        >
+          <Box>
+            <Typography sx={{ fontSize: "13px", fontWeight: 700, color: colors.grey[100] }}>
+              {loan.loanType} — ${Number(loan.loanAmount).toLocaleString()}
+            </Typography>
+            <Typography sx={{ fontSize: "11px", color: colors.grey[500], fontFamily: "monospace", mt: "4px" }}>
+              {loan.loanId} · {loan.repaymentTerm} mo term · Requested {loan.requestedTime}
+            </Typography>
+          </Box>
+
+          <Chip
+            label={loan.status}
+            size="small"
+            sx={{
+              backgroundColor: sc.bg,
+              color: sc.text,
+              border: `1px solid ${sc.border}`,
+              fontSize: "10px",
+              fontWeight: 700,
+              height: "22px",
+            }}
+          />
+        </Box>
+      );
+    })}
+  </Box>
+)}
 
       {/* Active Loans */}
       <Box sx={{ ...card, mb: "20px" }}>
@@ -290,6 +476,161 @@ const PlanLoans = () => {
           </Box>
         ))}
       </Box>
+
+      {/* new loan request dialog */}
+      <Dialog
+        open={newLoanButton}
+        onClose={closeAndReset}
+        fullWidth
+        maxWidth="sm"
+        PaperProps={{
+          sx: {
+            borderRadius: "16px",
+            backgroundColor: colors.primary[400],
+            border: `1px solid ${colors.primary[300]}44`,
+            color: colors.grey[100],
+            boxShadow: "0 24px 64px rgba(0,0,0,0.4)",
+          },
+        }}
+      >
+        {/* Header */}
+        <DialogTitle sx={{ p: "20px 24px", pb: "16px" }}>
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+            <Box>
+              <Typography sx={{ fontSize: "17px", fontWeight: 700, color: colors.grey[100] }}>
+                Request New Loan
+              </Typography>
+              <Typography sx={{ fontSize: "12px", color: colors.grey[500], mt: "4px" }}>
+                Borrow against your vested plan balance
+              </Typography>
+            </Box>
+            <IconButton onClick={closeAndReset} size="small" sx={{ color: colors.grey[500], mt: "-4px" }}>
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+
+        <DialogContent sx={{ p: "0 24px 8px" }}>
+          {/* available-to-borrow strip */}
+          <Box
+            sx={{
+              backgroundColor: "#4CCEAC11",
+              border: "1px solid #4CCEAC33",
+              borderRadius: "8px",
+              p: "12px 16px",
+              mb: "20px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Typography sx={{ fontSize: "12px", color: colors.grey[400] }}>
+              Available to borrow
+            </Typography>
+            <Typography sx={{ fontSize: "15px", fontWeight: 700, color: "#4CCEAC" }}>
+              ${availableToBorrow.toLocaleString()}
+            </Typography>
+          </Box>
+
+          <Box sx={{ display: "flex", flexDirection: "column", gap: "18px" }}>
+            {/* Loan Purpose */}
+            <TextField
+              select
+              fullWidth
+              label="Loan Purpose"
+              value={loanPurpose}
+              onChange={(e) => setLoanPurpose(e.target.value)}
+              sx={inputSx}
+            >
+              {loanPurposes.map((p)=>(
+                <MenuItem key={p} value={p} sx={{ fontSize: "13px" }}>
+                  {p}
+                </MenuItem>
+              ))}
+              
+            </TextField>
+
+            {/* Loan Amount */}
+            <TextField
+              fullWidth
+              type="number"
+              label="Loan Amount"
+              placeholder="0.00"
+              value={loanAmount}
+              onChange={(e) => setLoanAmount(e.target.value)}
+              error={exceedsLimit}
+              helperText={
+                exceedsLimit
+                  ? `Amount exceeds your available limit of $${availableToBorrow.toLocaleString()}`
+                  : " "
+              }
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Typography sx={{ color: colors.grey[500], fontSize: "13px" }}>$</Typography>
+                  </InputAdornment>
+                ),
+              }}
+              FormHelperTextProps={{ sx: { fontSize: "11px", ml: 0 } }}
+              sx={inputSx}
+            />
+
+            {/* Repayment Term */}
+            <TextField
+              select
+              fullWidth
+              label="Repayment Term"
+              value={repaymentTerm}
+              onChange={(e) => setRepaymentTerm(e.target.value)}
+              sx={inputSx}
+            >
+              {repaymentTerms.map((t) => (
+                <MenuItem key={t.value} value={t.value} sx={{ fontSize: "13px" }}>
+                  {t.label}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Box>
+        </DialogContent>
+
+        {/* Footer */}
+        <DialogActions sx={{ p: "20px 24px", pt: "8px" }}>
+          <Button
+            onClick={closeAndReset}
+            sx={{
+              color: colors.grey[400],
+              textTransform: "none",
+              fontSize: "13px",
+              fontWeight: 600,
+              borderRadius: "8px",
+              px: "16px",
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            disabled={!canSubmit}
+            variant="contained"
+            sx={{
+              backgroundColor: "#4CCEAC",
+              color: "#0b1b17",
+              textTransform: "none",
+              fontSize: "13px",
+              fontWeight: 700,
+              borderRadius: "8px",
+              px: "18px",
+              "&:hover": { backgroundColor: "#3fb89a" },
+              "&.Mui-disabled": {
+                backgroundColor: colors.primary[700],
+                color: colors.grey[600],
+              },
+            }}
+          >
+            Submit Request
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

@@ -50,7 +50,7 @@ const Login = () => {
     setIsLoading(true);
     try {
       console.log("1. Calling login...");
-      await login(email.trim(), password, remember);
+      await login(email.trim(), password);
       console.log("2. Login successful — navigating to /dashboard");
 
       navigate("/dashboard", { replace: true });
