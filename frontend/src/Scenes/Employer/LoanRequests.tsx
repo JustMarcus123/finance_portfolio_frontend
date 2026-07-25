@@ -2,7 +2,8 @@ import { Box, Typography, useTheme, Button, Chip, ToggleButtonGroup, ToggleButto
 import { tokens } from "../../theme";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { FetchLoanRequestApi } from "./API/FetchLoanApi";
 
 // ── static data ───────────────────────────────────────────────────────────────
 const summaryCards = [
@@ -25,8 +26,20 @@ const allActiveLoans = [
   { name: "Diana Ross",    tag: "TERMINATED",  tagColor: "#ef4444", id: "LOAN-2024-012", original: "$15,000", balance: "$12,800", rate: "5.5%", deduction: "PAYROLL ENDED", payoff: "Due NOW", status: "AT RISK",  statusColor: "#ef4444", statusBg: "#ef444411", statusBorder: "#ef444433" },
 ];
 
+
+//data types declaration
+interface LoanRequestType  {
+  loanAmount: string,
+  loanId:string,
+  loanPurpose:string,
+  repaymentTerm: string,
+  requestedTime: string,
+  user: string
+}
+
 // ── component ──────────────────────────────────────────────────────────────────
 const LoanRequests = () => {
+
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [loanFilter, setLoanFilter] = useState<LoanFilter>("Active");
@@ -42,6 +55,36 @@ const LoanRequests = () => {
 
   const colsPending = "1.6fr 0.9fr 0.8fr 0.8fr 1fr 1fr 1fr 1fr 1fr";
   const colsActive  = "1.4fr 1.2fr 0.8fr 0.8fr 0.6fr 1fr 0.9fr 0.8fr";
+
+
+
+  ///to fetch loan request of every employee under this user's supervise
+
+  const [loanRequest, setLoanRequest] = useState <LoanRequestType []>([]);
+
+  console.log("requested loans",loanRequest)
+
+  useEffect(()=>{
+
+    const FetchLoan = async()=>{
+      try {
+
+        const data = await FetchLoanRequestApi();
+        //set the loanRequest 
+        setLoanRequest(data); 
+
+      } catch (error) {
+        console.error("displaying requested loan fails")
+      }
+
+    }
+
+    FetchLoan();
+
+
+
+  },[])
+
 
   return (
     <Box sx={{ p: "24px 28px", overflowY: "auto" }}>
@@ -82,23 +125,23 @@ const LoanRequests = () => {
         </Box>
 
         {/* Pending rows */}
-        {pendingLoans.map((row, i) => (
+        {loanRequest.map((row, i) => (
           <Box key={i} sx={{ display: "grid", gridTemplateColumns: colsPending, py: "12px", alignItems: "center",
             borderBottom: i < pendingLoans.length - 1 ? `1px solid ${colors.primary[300]}22` : "none",
             "&:hover": { backgroundColor: colors.primary[700] + "22", borderRadius: "6px" } }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <Avatar sx={{ width: 30, height: 30, backgroundColor: row.avatarBg, fontSize: "11px", fontWeight: 700 }}>
-                {row.initials}
-              </Avatar>
-              <Typography sx={{ fontSize: "13px", fontWeight: 600, color: colors.grey[100] }}>{row.name}</Typography>
+              {/* <Avatar sx={{ width: 30, height: 30, backgroundColor: row.avatarBg, fontSize: "11px", fontWeight: 700 }}>
+                {row.user}
+              </Avatar> */}
+              <Typography sx={{ fontSize: "13px", fontWeight: 600, color: colors.grey[100] }}>{row.user}</Typography>
             </Box>
-            <Typography sx={{ fontSize: "12px", color: colors.grey[400] }}>{row.requested}</Typography>
-            <Typography sx={{ fontSize: "13px", fontWeight: 700, color: colors.grey[100] }}>{row.amount}</Typography>
-            <Typography sx={{ fontSize: "12px", color: colors.grey[300] }}>{row.term}</Typography>
+            <Typography sx={{ fontSize: "12px", color: colors.grey[400] }}>{row.requestedTime}</Typography>
+            <Typography sx={{ fontSize: "13px", fontWeight: 700, color: colors.grey[100] }}>{row.loanAmount}</Typography>
+            <Typography sx={{ fontSize: "12px", color: colors.grey[300] }}>{row.repaymentTerm}</Typography>
             <Typography sx={{ fontSize: "12px", color: colors.grey[300] }}>{row.monthly}</Typography>
             <Typography sx={{ fontSize: "12px", color: colors.grey[300] }}>{row.vested}</Typography>
             <Typography sx={{ fontSize: "12px", color: colors.grey[300] }}>{row.maxEligible}</Typography>
-            <Typography sx={{ fontSize: "12px", color: colors.grey[400] }}>{row.reason}</Typography>
+            <Typography sx={{ fontSize: "12px", color: colors.grey[400] }}>{row.loanPurpose}</Typography>
             <Box sx={{ display: "flex", gap: "6px" }}>
               <Button size="small" startIcon={<CheckIcon sx={{ fontSize: "12px !important" }} />}
                 sx={{ fontSize: "11px", fontWeight: 700, color: "#fff", backgroundColor: "#3b82f6", textTransform: "none",
