@@ -19,7 +19,6 @@ export const CreateEmployeeApi = async(data:CreateEmployeeTypes)=>{
     const response = await fetch(`${BASE_URL}/api/employee/add`,{
         method: "POST",
         headers:{"content-type": "application/json","Authorization":`Bearer ${localStorage.getItem("accessToken")}`},
-        
         body:JSON.stringify(data)
     });
 
