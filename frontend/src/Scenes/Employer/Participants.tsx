@@ -42,14 +42,13 @@ interface EmployeeType {
   email: string;
   department: string;
   jobTitle: string;
-  annualSalary: string;
-  deferralRate: string;
-  employeeId: string; //EMP-00182
-  status: string; //ACTIVE, NOT_ENROLLED, PENDING, TERMINATED
+  annualSalary: number;
+  deferralRate: number;
+  employeeId: string;
+  status: string;
   balance?: number;
-  vested?:string;
-  loan?:string
-
+  vested?: number;
+  loan?: number;
   startDate: string;
 }
 
@@ -275,7 +274,7 @@ const EmployerDashboard = () => {
           {statCards.map((card, i) => (
             <Box
               key={i}
-              sx={{ ...cardSx, borderTop: `3px solid ${card.accent}` }}
+              // sx={{ ...cardSx, borderTop: `3px solid ${card.accent}` }}
             >
               <Typography
                 sx={{
@@ -315,11 +314,11 @@ const EmployerDashboard = () => {
                   {card.change}
                 </Typography>
               </Box> */}
-              <Typography
+              {/* <Typography
                 sx={{ fontSize: "11px", color: colors.grey[600], mt: "2px" }}
               >
                 {card.sub}
-              </Typography>
+              </Typography> */}
             </Box>
           ))}
         </Box>

@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "/Users/choinu/.nvm/versions/node/v22.22.1/bin/node node_modules/vite/bin/vite.js",
+    "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -16,7 +16,6 @@
     "@mui/material": "^7.3.11",
     "@mui/x-data-grid": "^8.27.5",
     "@reduxjs/toolkit": "^2.12.0",
-    "@rolldown/binding-darwin-arm64": "^1.1.0",
     "chart.js": "^4.5.1",
     "react": "^18.3.1",
     "react-chartjs-2": "^5.3.1",

@@ -21,7 +21,14 @@ const fundMenu = [
 ];
 
 // ── custom tooltip ─────────────────────────────────────────────────────────────
-const CustomTooltip = ({ active, payload, colors }: { active?: boolean; payload?: any[]; colors: any }) => {
+const CustomTooltip = ({
+  active,
+  payload,
+  colors,
+}: {
+  active?: boolean;
+  payload?: readonly any[];
+  colors: any; }) => {
   if (!active || !payload?.length) return null;
   const d = payload[0].payload;
   return (
