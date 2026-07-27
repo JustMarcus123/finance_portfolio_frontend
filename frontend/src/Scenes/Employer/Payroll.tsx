@@ -176,9 +176,8 @@ const PayrollPage = () => {
         </Button>
       </Box>
 
-      <Grid container spacing={3}>
-        {/* LEFT - Upload Section */}
-        <Grid item xs={12} md={5.5}>
+    <Grid container spacing={3}>
+  <Grid size={{ xs: 12, md: 5.5 }}>
           <Box sx={cardSx}>
             <Typography
               sx={{
@@ -335,7 +334,7 @@ const PayrollPage = () => {
         </Grid>
 
         {/* RIGHT - Recent Batches */}
-        <Grid item xs={12} md={6.5}>
+        <Grid size={{ xs: 12, md: 6.5 }}>
           <Box sx={cardSx}>
             <Typography sx={{ fontSize: "16px", fontWeight: 600, mb: 2 }}>
               Recent Payroll Batches
