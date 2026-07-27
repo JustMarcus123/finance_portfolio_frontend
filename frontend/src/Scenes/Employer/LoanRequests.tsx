@@ -1,9 +1,11 @@
-import { Box, Typography, useTheme, Button, Chip, ToggleButtonGroup, ToggleButton, Avatar } from "@mui/material";
+import { Box, Typography, useTheme, Button, Chip, ToggleButtonGroup, ToggleButton, Avatar, Dialog,DialogTitle,DialogContent,DialogActions ,IconButton} from "@mui/material";
 import { tokens } from "../../theme";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import { useEffect, useState } from "react";
 import { FetchLoanRequestApi } from "./API/FetchLoanApi";
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import { loanApproveAPi } from "./API/loanApproveApi";
 
 // ── static data ───────────────────────────────────────────────────────────────
 
@@ -18,16 +20,17 @@ const allActiveLoans = [
 
 
 //data types declaration
-interface LoanRequestType  {
+interface LoanRequestType {
   loanAmount: string,
-  loanId:string,
-  loanPurpose:string,
+  loanId: string,
+  loanPurpose: string,
   repaymentTerm: string,
   requestedTime: string,
   user: string,
   maxEligible: string,
   vestedBalance: string,
-  monthlyPayment:string
+  monthlyPayment: string,
+  status: "PENDING" | "APPROVED" | "REJECTED"
 }
 
 // ── component ──────────────────────────────────────────────────────────────────
@@ -55,6 +58,12 @@ const LoanRequests = () => {
 
   const [loanRequest, setLoanRequest] = useState <LoanRequestType []>([]);
 
+  //selected loan for approving
+  const [selectedLoan,setSelectedLoan ] = useState <LoanRequestType | null>(null)
+
+  //dialog opener for loan approval
+  const [approveOpen,setApproveOpen] = useState(false)
+
   console.log("requested loans",loanRequest)
 
   useEffect(()=>{
@@ -77,6 +86,25 @@ const LoanRequests = () => {
 
 
   },[])
+
+
+  //approve function
+   const handleApprove = async()=>{
+if(!selectedLoan){
+  console.error("no loan selected")
+  return;
+}
+
+try {
+  
+  await loanApproveAPi(selectedLoan.loanId)
+
+} catch (error) {
+  console.log(error)
+}
+
+
+   }
 
 
   const summaryCards = [
@@ -147,7 +175,11 @@ const LoanRequests = () => {
             <Box sx={{ display: "flex", gap: "6px" }}>
               <Button size="small" startIcon={<CheckIcon sx={{ fontSize: "12px !important" }} />}
                 sx={{ fontSize: "11px", fontWeight: 700, color: "#fff", backgroundColor: "#3b82f6", textTransform: "none",
-                  px: "8px", py: "3px", minWidth: 0, borderRadius: "6px", "&:hover": { backgroundColor: "#2563eb" } }}>
+                  px: "8px", py: "3px", minWidth: 0, borderRadius: "6px", "&:hover": { backgroundColor: "#2563eb" } }}
+                  onClick={()=>{
+                    setSelectedLoan(loan);
+                    setApproveOpen(true)}}
+                  >
                 Approve
               </Button>
               <Button size="small" startIcon={<CloseIcon sx={{ fontSize: "12px !important" }} />}
@@ -218,6 +250,192 @@ const LoanRequests = () => {
           </Box>
         ))}
       </Box>
+
+
+{/* dialog for loan approve */}
+<Dialog
+  open={approveOpen}
+  onClose={() => setApproveOpen(false)}
+  fullWidth
+  maxWidth="sm"
+  PaperProps={{
+    sx: {
+      borderRadius: "16px",
+      backgroundColor: colors.primary[400],
+      border: `1px solid ${colors.primary[300]}44`,
+      color: colors.grey[100],
+      boxShadow: "0 24px 64px rgba(0,0,0,0.4)",
+    },
+  }}
+>
+  {selectedLoan && (
+    <>
+      {/* Header */}
+      <DialogTitle sx={{ p: "20px 24px", pb: "16px" }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <Avatar sx={{ width: 40, height: 40, fontSize: "14px", fontWeight: 700, backgroundColor: "#3b82f6" }}>
+              {selectedLoan.user.charAt(0)}
+            </Avatar>
+            <Box>
+              <Typography sx={{ fontSize: "16px", fontWeight: 700, color: colors.grey[100] }}>
+                {selectedLoan.user}
+              </Typography>
+              <Typography sx={{ fontSize: "11px", color: colors.grey[500], fontFamily: "monospace", mt: "2px" }}>
+                {selectedLoan.loanId}
+              </Typography>
+            </Box>
+          </Box>
+          <IconButton onClick={() => setApproveOpen(false)} size="small" sx={{ color: colors.grey[500], mt: "-4px" }}>
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </Box>
+      </DialogTitle>
+
+      <DialogContent sx={{ p: "0 24px 8px" }}>
+        {/* Loan amount highlight strip */}
+        <Box
+          sx={{
+            backgroundColor: "#3b82f611",
+            border: "1px solid #3b82f633",
+            borderRadius: "10px",
+            p: "16px 18px",
+            mb: "20px",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Box>
+            <Typography sx={{ fontSize: "11px", color: colors.grey[500], mb: "4px" }}>
+              REQUESTED LOAN AMOUNT
+            </Typography>
+            <Typography sx={{ fontSize: "26px", fontWeight: 700, color: "#3b82f6" }}>
+              ${Number(selectedLoan.loanAmount).toLocaleString()}
+            </Typography>
+          </Box>
+          <Chip
+            label={selectedLoan.loanPurpose}
+            size="small"
+            sx={{
+              backgroundColor: colors.primary[700] + "66",
+              color: colors.grey[200],
+              border: `1px solid ${colors.primary[300]}44`,
+              fontSize: "11px",
+              fontWeight: 600,
+            }}
+          />
+        </Box>
+
+        {/* Detail grid */}
+        <Box sx={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "12px", mb: "20px" }}>
+          {[
+            { label: "Repayment Term", value: `${selectedLoan.repaymentTerm} months` },
+            { label: "Monthly Payment", value: `$${Number(selectedLoan.monthlyPayment).toFixed(2)}` },
+            { label: "Vested Balance", value: `$${Number(selectedLoan.vestedBalance).toLocaleString()}` },
+            { label: "Max Eligible", value: `$${Number(selectedLoan.maxEligible).toLocaleString()}` },
+          ].map((item) => (
+            <Box
+              key={item.label}
+              sx={{
+                backgroundColor: colors.blueAccent[900],
+                border: `1px solid ${colors.primary[300]}22`,
+                borderRadius: "8px",
+                p: "12px 14px",
+              }}
+            >
+              <Typography sx={{ fontSize: "10px", color: colors.grey[500], mb: "4px", letterSpacing: "0.4px" }}>
+                {item.label.toUpperCase()}
+              </Typography>
+              <Typography sx={{ fontSize: "15px", fontWeight: 700, color: colors.grey[100] }}>
+                {item.value}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+
+        {/* Requested date */}
+        <Typography sx={{ fontSize: "11px", color: colors.grey[500], mb: "8px" }}>
+          Requested on {selectedLoan.requestedTime.split("T")[0]}
+        </Typography>
+
+        {/* Eligibility check */}
+        {Number(selectedLoan.loanAmount) > Number(selectedLoan.maxEligible) ? (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              backgroundColor: "#ef444411",
+              border: "1px solid #ef444433",
+              borderRadius: "8px",
+              p: "10px 14px",
+              mb: "8px",
+            }}
+          >
+            <Typography sx={{ fontSize: "12px", color: "#ef4444", fontWeight: 600 }}>
+              ⚠ Requested amount exceeds max eligible limit
+            </Typography>
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              backgroundColor: "#4CCEAC11",
+              border: "1px solid #4CCEAC33",
+              borderRadius: "8px",
+              p: "10px 14px",
+              mb: "8px",
+            }}
+          >
+            <CheckCircleOutlineIcon sx={{ fontSize: 16, color: "#4CCEAC" }} />
+            <Typography sx={{ fontSize: "12px", color: "#4CCEAC", fontWeight: 600 }}>
+              Within eligible loan limit
+            </Typography>
+          </Box>
+        )}
+      </DialogContent>
+
+      {/* Footer */}
+      <DialogActions sx={{ p: "20px 24px", pt: "12px" }}>
+        <Button
+          onClick={() => setApproveOpen(false)}
+          sx={{
+            color: colors.grey[400],
+            textTransform: "none",
+            fontSize: "13px",
+            fontWeight: 600,
+            borderRadius: "8px",
+            px: "16px",
+          }}
+        >
+          Cancel
+        </Button>
+        <Button
+          onClick={handleApprove}
+          variant="contained"
+          startIcon={<CheckIcon sx={{ fontSize: "16px !important" }} />}
+          sx={{
+            backgroundColor: "#3b82f6",
+            color: "#fff",
+            textTransform: "none",
+            fontSize: "13px",
+            fontWeight: 700,
+            borderRadius: "8px",
+            px: "18px",
+            "&:hover": { backgroundColor: "#2563eb" },
+          }}
+        >
+          Confirm Approval
+        </Button>
+      </DialogActions>
+    </>
+  )}
+</Dialog>
+
+
     </Box>
   );
 };

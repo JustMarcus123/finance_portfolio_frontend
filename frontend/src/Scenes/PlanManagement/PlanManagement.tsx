@@ -806,7 +806,7 @@ const PlanManagement = () => {
                   <Button
                     // startIcon={<VisibilityOutlinedIcon sx={{ fontSize: 14 }} />}1
                     onClick={() => {
-                      setSelectedSponsor(mappped_sponsor); // Fixed typo: mappped_sponsor → mapped_sponsor
+                      setSelectedSponsor(mappped_sponsor);
                       setViewSponsor(true);
                     }}
                     sx={{
@@ -834,8 +834,8 @@ const PlanManagement = () => {
                   <Button
                     // startIcon={<EditIcon sx={{ fontSize: 14 }} />}
                     onClick={() => {
-                      console.log("Full sponsor object:", mappped_sponsor); // ← Add this
-                      console.log("Sponsor ID:", mappped_sponsor?.id); // ← Add this
+                      console.log("Full sponsor object:", mappped_sponsor); 
+                      console.log("Sponsor ID:", mappped_sponsor?.id); 
                       handleOpenEdit(mappped_sponsor);
                     }}
                     sx={{
