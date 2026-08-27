@@ -1206,6 +1206,8 @@ const PlanManagement = () => {
         </DialogActions>
       </Dialog>
 
+      
+
       {/* ── View Sponsor dialog ──────────────────────────────────────────────── */}
       <Dialog
         open={viewSponsor}

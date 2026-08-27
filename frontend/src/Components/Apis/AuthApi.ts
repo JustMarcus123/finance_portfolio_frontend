@@ -51,7 +51,8 @@ export const request = async <T>(
     res = await fetch(url, {
       method,
       credentials: "include",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" ,"ngrok-skip-browser-warning": "true", },
+      
       body: body ? JSON.stringify(body) : undefined,
     });
   } catch (error) {
@@ -93,6 +94,7 @@ export const getMeApi = async (): Promise<MeResponse | null> => {
   try {
     const res = await fetch(`${BASE_URL}/api/auth/me`, {
       credentials: "include",
+      headers:{"ngrok-skip-browser-warning": "true", }
     });
 
     if (res.status === 401) {
